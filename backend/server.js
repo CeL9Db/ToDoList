@@ -4,7 +4,7 @@ require('dotenv').config({ quiet: true })
 const express = require('express')
 const cors = require('cors')
 const mongoose = require('mongoose')
-const Donnee = require('./model/donnee')
+const todoRoutes = require('./routes/todoRoutes')
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -14,16 +14,8 @@ const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/todolist'
 app.use(cors())
 app.use(express.json())
 
-// Renvoie toutes les tâches, de la plus récente à la plus ancienne
-app.get('/api/todos', async (req, res) => {
-    try {
-        const taches = await Donnee.find().sort({ date: -1 })
-        res.json(taches)
-    } catch (erreur) {
-        console.error(erreur.message)
-        res.status(500).json({ message: 'Erreur lors de la récupération des tâches.' })
-    }
-})
+// Toutes les routes des tâches sont dans backend/routes/todoRoutes.js
+app.use('/api/todos', todoRoutes)
 
 // Connexion à la base MongoDB locale, puis démarrage du serveur
 async function demarrer() {
