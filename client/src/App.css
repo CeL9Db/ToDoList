@@ -1,42 +1,204 @@
-#root {
-  max-width: 1280px;
+/* Mise en page générale : une colonne centrée */
+.page {
+  max-width: 720px;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  padding: var(--espace-5) var(--espace-4);
+}
+
+/* En-tête */
+.entete {
+  display: flex;
+  align-items: center;
+  gap: var(--espace-3);
+  margin-bottom: var(--espace-5);
 }
 
 .logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--rayon);
+  background: var(--accent);
+  color: #ffffff;
+  box-shadow: var(--ombre);
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
+.entete-titre {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.entete-sous-titre {
+  color: var(--texte-doux);
+  font-size: 0.95rem;
+}
+
+/* Liste des tâches */
+.liste {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-3);
+}
+
+.carte {
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  padding: var(--espace-4);
+  box-shadow: var(--ombre);
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+
+.carte:hover {
+  box-shadow: var(--ombre-survol);
+  transform: translateY(-2px);
+}
+
+.carte-entete {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--espace-3);
+}
+
+.carte-titre {
+  font-size: 1.1rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.carte-desc {
+  margin-top: var(--espace-2);
+  color: var(--texte-doux);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.carte-date {
+  display: flex;
+  align-items: center;
+  gap: var(--espace-2);
+  margin-top: var(--espace-3);
+  color: var(--texte-doux);
+  font-size: 0.85rem;
+}
+
+/* Pastille du status */
+.pastille {
+  flex-shrink: 0;
+  padding: var(--espace-1) 0.75rem;
+  border-radius: 999px;
+  background: var(--fond);
+  color: var(--texte-doux);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pastille-encours {
+  background: var(--accent-clair);
+  color: var(--accent-fonce);
+}
+
+.pastille-fini {
+  background: var(--succes-clair);
+  color: var(--succes);
+}
+
+/* États : chargement, liste vide, erreur */
+.etat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espace-2);
+  padding: var(--espace-5) var(--espace-4);
+  background: var(--surface);
+  border: 1px dashed var(--bordure);
+  border-radius: var(--rayon);
+  text-align: center;
+}
+
+.etat-icone {
+  color: var(--accent);
+  margin-bottom: var(--espace-2);
+}
+
+.etat-titre {
+  font-weight: 600;
+}
+
+.etat-texte {
+  color: var(--texte-doux);
+  max-width: 40ch;
+}
+
+.etat-erreur {
+  border-style: solid;
+  border-color: var(--danger);
+  background: var(--danger-clair);
+}
+
+.etat-erreur .etat-icone {
+  color: var(--danger);
+}
+
+.rotation {
+  animation: tourner 1s linear infinite;
+}
+
+@keyframes tourner {
   to {
     transform: rotate(360deg);
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+/* Bouton principal */
+.bouton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espace-2);
+  margin-top: var(--espace-3);
+  padding: 0.6rem 1.1rem;
+  border: none;
+  border-radius: var(--rayon-petit);
+  background: var(--accent);
+  color: #ffffff;
+  font-weight: 600;
+  transition: background var(--transition), transform var(--transition);
+}
+
+.bouton:hover {
+  background: var(--accent-fonce);
+}
+
+.bouton:active {
+  transform: scale(0.97);
+}
+
+/* Sur mobile : moins de marges, la pastille passe sous le titre */
+@media (max-width: 520px) {
+  .page {
+    padding: var(--espace-4) var(--espace-3);
   }
-}
 
-.card {
-  padding: 2em;
-}
+  .entete {
+    margin-bottom: var(--espace-4);
+  }
 
-.read-the-docs {
-  color: #888;
+  .entete-titre {
+    font-size: 1.5rem;
+  }
+
+  .carte {
+    padding: var(--espace-3);
+  }
+
+  .carte-entete {
+    flex-direction: column;
+    gap: var(--espace-2);
+  }
 }

@@ -1,68 +1,98 @@
+/* Variables du thème clair : couleurs, espacements, arrondis, ombres */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --fond: #f5f6fa;
+  --surface: #ffffff;
+  --bordure: #e3e6ee;
+  --texte: #1c2030;
+  --texte-doux: #646b80;
+  --accent: #4f6bed;
+  --accent-fonce: #3f58d0;
+  --accent-clair: #e9edfd;
+  --succes: #1f8a5b;
+  --succes-clair: #e2f4eb;
+  --danger: #c93c3c;
+  --danger-clair: #fbeaea;
+
+  --espace-1: 0.25rem;
+  --espace-2: 0.5rem;
+  --espace-3: 1rem;
+  --espace-4: 1.5rem;
+  --espace-5: 2.5rem;
+
+  --rayon: 14px;
+  --rayon-petit: 8px;
+  --ombre: 0 1px 2px rgba(20, 25, 50, 0.05), 0 6px 20px rgba(20, 25, 50, 0.06);
+  --ombre-survol: 0 2px 4px rgba(20, 25, 50, 0.06), 0 12px 28px rgba(20, 25, 50, 0.1);
+  --transition: 0.2s ease;
+
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
   line-height: 1.5;
-  font-weight: 400;
-
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+/* Thème sombre : on suit le réglage du système */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fond: #12141c;
+    --surface: #1b1e29;
+    --bordure: #2b2f3e;
+    --texte: #eceef5;
+    --texte-doux: #9aa1b5;
+    --accent: #8097ff;
+    --accent-fonce: #9aadff;
+    --accent-clair: #242b4a;
+    --succes: #5fcb98;
+    --succes-clair: #1a3329;
+    --danger: #f08080;
+    --danger-clair: #3a2023;
+
+    --ombre: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.25);
+    --ombre-survol: 0 2px 4px rgba(0, 0, 0, 0.35), 0 12px 28px rgba(0, 0, 0, 0.35);
+  }
 }
-a:hover {
-  color: #535bf2;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
   min-height: 100vh;
+  background: var(--fond);
+  color: var(--texte);
+  font-size: 1rem;
+  -webkit-font-smoothing: antialiased;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+h1,
+h2,
+p,
+ul {
+  margin: 0;
+  padding: 0;
+}
+
+ul {
+  list-style: none;
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+  font: inherit;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
+/* Contour bien visible quand on navigue au clavier */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Moins d'animations pour les personnes qui le demandent dans leur système */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }

@@ -79,9 +79,14 @@ Ouvrir `http://localhost:5000/api/todos` dans le navigateur : la liste des tâch
 
 ```
 backend/
-  model/donnee.js   Forme d'une tâche dans la base (titre, status, desc, date)
-  server.js         Démarrage du serveur et connexion à MongoDB
+  model/donnee.js                 Forme d'une tâche dans la base (titre, status, desc, date)
+  routes/todoRoutes.js            Adresses de l'API des tâches
+  controllers/todoController.js   Ce que fait chaque adresse (lire, créer, modifier, supprimer)
+  server.js                       Démarrage du serveur et connexion à MongoDB
 client/
-  src/              Code de l'interface React
-.env.example        Modèle du fichier de configuration
+  src/App.jsx                     Page principale : affiche la liste des tâches
+  src/components/                 Composants de l'interface
+  src/services/api.js             Appels au serveur avec axios
+  .env.example                    Adresse de l'API (à copier en .env seulement si le port change)
+.env.example                      Modèle du fichier de configuration du serveur
 ```
