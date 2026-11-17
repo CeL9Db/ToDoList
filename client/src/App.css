@@ -3,6 +3,8 @@
   max-width: 720px;
   margin: 0 auto;
   padding: var(--espace-5) var(--espace-4);
+  /* Place en bas pour que la notification ne cache pas la dernière carte */
+  padding-bottom: 6rem;
 }
 
 /* En-tête */
@@ -78,13 +80,57 @@
   overflow-wrap: anywhere;
 }
 
+.carte-pied {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espace-3);
+  margin-top: var(--espace-3);
+}
+
 .carte-date {
   display: flex;
   align-items: center;
   gap: var(--espace-2);
-  margin-top: var(--espace-3);
   color: var(--texte-doux);
   font-size: 0.85rem;
+}
+
+/* Petit bouton rond qui ne contient qu'une icône */
+.bouton-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--texte-doux);
+  transition: background var(--transition), color var(--transition), opacity var(--transition);
+}
+
+.bouton-icone:hover {
+  background: var(--fond);
+  color: var(--texte);
+}
+
+/* La corbeille reste discrète et devient rouge au survol */
+.bouton-supprimer:hover {
+  background: var(--danger-clair);
+  color: var(--danger);
+}
+
+/* Sur ordinateur, la corbeille n'apparaît qu'au survol de la carte (ou au clavier) */
+@media (hover: hover) {
+  .carte .bouton-supprimer {
+    opacity: 0;
+  }
+
+  .carte:hover .bouton-supprimer,
+  .carte .bouton-supprimer:focus-visible {
+    opacity: 1;
+  }
 }
 
 /* Pastille du status */
@@ -274,6 +320,92 @@ kbd {
   cursor: wait;
 }
 
+/* Notification en bas de l'écran (suppression avec "Annuler") */
+.notification {
+  position: fixed;
+  left: 50%;
+  bottom: var(--espace-4);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: var(--espace-2);
+  width: max-content;
+  max-width: calc(100% - 2 * var(--espace-3));
+  padding: var(--espace-2) var(--espace-2) var(--espace-2) var(--espace-3);
+  overflow: hidden;
+  border-radius: var(--rayon);
+  background: var(--notification-fond);
+  color: var(--notification-texte);
+  box-shadow: var(--ombre-survol);
+  transform: translateX(-50%);
+  animation: apparaitre 0.25s ease;
+}
+
+.notification-texte {
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.notification-annuler {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espace-1);
+  flex-shrink: 0;
+  padding: 0.4rem 0.75rem;
+  border: none;
+  border-radius: var(--rayon-petit);
+  background: transparent;
+  color: var(--notification-accent);
+  font-weight: 700;
+  transition: background var(--transition);
+}
+
+.notification-annuler:hover {
+  background: rgba(128, 128, 128, 0.2);
+}
+
+.notification-fermer {
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 0.4rem;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  opacity: 0.7;
+  transition: opacity var(--transition), background var(--transition);
+}
+
+.notification-fermer:hover {
+  opacity: 1;
+  background: rgba(128, 128, 128, 0.2);
+}
+
+/* Barre qui se vide pour montrer le temps restant */
+.notification-barre {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--notification-accent);
+  transform-origin: left;
+  animation: vider linear forwards;
+}
+
+@keyframes apparaitre {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 12px);
+  }
+}
+
+@keyframes vider {
+  to {
+    transform: scaleX(0);
+  }
+}
+
 /* Texte lu par les lecteurs d'écran mais caché à l'écran */
 .cache {
   position: absolute;
@@ -287,7 +419,7 @@ kbd {
 /* Sur mobile : moins de marges, la pastille passe sous le titre */
 @media (max-width: 520px) {
   .page {
-    padding: var(--espace-4) var(--espace-3);
+    padding: var(--espace-4) var(--espace-3) 7rem;
   }
 
   .entete {
@@ -319,5 +451,9 @@ kbd {
   .bouton-ajout {
     width: 100%;
     justify-content: center;
+  }
+
+  .notification {
+    bottom: var(--espace-3);
   }
 }

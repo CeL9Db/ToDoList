@@ -1,4 +1,4 @@
-import { Calendar } from 'lucide-react'
+import { Calendar, Trash2 } from 'lucide-react'
 
 // Classe CSS de la pastille selon le status de la tâche
 const CLASSES_STATUS = {
@@ -17,7 +17,8 @@ function formaterDate(date) {
 }
 
 // Affiche une tâche : son titre, sa description, son status et sa date
-function CarteTache({ tache }) {
+// onSupprimer est appelée quand on clique sur la corbeille
+function CarteTache({ tache, onSupprimer }) {
   return (
     <li className="carte">
       <div className="carte-entete">
@@ -29,10 +30,22 @@ function CarteTache({ tache }) {
 
       {tache.desc && <p className="carte-desc">{tache.desc}</p>}
 
-      <p className="carte-date">
-        <Calendar size={14} aria-hidden="true" />
-        {formaterDate(tache.date)}
-      </p>
+      <div className="carte-pied">
+        <p className="carte-date">
+          <Calendar size={14} aria-hidden="true" />
+          {formaterDate(tache.date)}
+        </p>
+
+        <button
+          type="button"
+          className="bouton-icone bouton-supprimer"
+          onClick={() => onSupprimer(tache)}
+          aria-label={`Supprimer la tâche « ${tache.titre} »`}
+          title="Supprimer"
+        >
+          <Trash2 size={16} aria-hidden="true" />
+        </button>
+      </div>
     </li>
   )
 }
