@@ -2,6 +2,7 @@
 :root {
   --fond: #f5f6fa;
   --surface: #ffffff;
+  --colonne-fond: #eceef5;
   --bordure: #e3e6ee;
   --texte: #1c2030;
   --texte-doux: #646b80;
@@ -38,6 +39,7 @@
   :root {
     --fond: #12141c;
     --surface: #1b1e29;
+    --colonne-fond: #171a24;
     --bordure: #2b2f3e;
     --texte: #eceef5;
     --texte-doux: #9aa1b5;
@@ -74,6 +76,7 @@ body {
 
 h1,
 h2,
+h3,
 p,
 ul {
   margin: 0;

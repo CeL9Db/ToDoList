@@ -17,6 +17,12 @@ export async function ajouterTache(tache) {
   return reponse.data
 }
 
+// Modifie une tâche (titre, desc ou status) et renvoie la tâche mise à jour
+export async function modifierTache(id, modifications) {
+  const reponse = await api.put(`/todos/${id}`, modifications)
+  return reponse.data
+}
+
 // Supprime définitivement une tâche à partir de son _id
 export async function supprimerTache(id) {
   const reponse = await api.delete(`/todos/${id}`)

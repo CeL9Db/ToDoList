@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { CircleAlert, Inbox, ListTodo, LoaderCircle, RefreshCw } from 'lucide-react'
-import { recupererTaches, supprimerTache, supprimerTacheAvantFermeture } from './services/api'
-import CarteTache from './components/CarteTache'
+import { modifierTache, recupererTaches, supprimerTache, supprimerTacheAvantFermeture } from './services/api'
+import { STATUTS } from './statuts'
+import ColonneStatut from './components/ColonneStatut'
 import FormulaireAjout from './components/FormulaireAjout'
 import Notification from './components/Notification'
 import './App.css'
@@ -50,6 +51,35 @@ function App() {
   // Une tâche vient d'être créée : on la met en haut de la liste, sans recharger la page
   function ajouterALaListe(tache) {
     setTaches((anciennes) => [tache, ...anciennes])
+  }
+
+  // Remplace une tâche de la liste par sa nouvelle version (même _id)
+  function remplacerDansLaListe(tacheModifiee) {
+    setTaches((anciennes) => anciennes.map((t) => (t._id === tacheModifiee._id ? tacheModifiee : t)))
+  }
+
+  // Changement de status : la carte change de colonne tout de suite,
+  // et si le serveur refuse, elle revient à sa place
+  async function changerStatus(tache, nouveauStatus) {
+    remplacerDansLaListe({ ...tache, status: nouveauStatus })
+    try {
+      const tacheModifiee = await modifierTache(tache._id, { status: nouveauStatus })
+      remplacerDansLaListe(tacheModifiee)
+    } catch {
+      remplacerDansLaListe(tache)
+      setNotification({
+        cle: Date.now(),
+        message: "Le changement de status a échoué, la tâche est revenue à sa place.",
+        annulable: false,
+      })
+    }
+  }
+
+  // Modification du titre et de la description depuis la carte
+  // En cas d'erreur, l'exception remonte jusqu'à la carte qui affiche le message
+  async function enregistrerModification(tache, modifications) {
+    const tacheModifiee = await modifierTache(tache._id, modifications)
+    remplacerDansLaListe(tacheModifiee)
   }
 
   // Si l'onglet est fermé pendant les 5 secondes, on envoie quand même la suppression
@@ -135,7 +165,7 @@ function App() {
     }
   }
 
-  // Choisit ce qu'il faut afficher : chargement, erreur, liste vide ou liste des tâches
+  // Choisit ce qu'il faut afficher : chargement, erreur, liste vide ou tableau des tâches
   function afficherContenu() {
     if (chargement) {
       return (
@@ -171,11 +201,19 @@ function App() {
     }
 
     return (
-      <ul className="liste">
-        {taches.map((tache) => (
-          <CarteTache key={tache._id} tache={tache} onSupprimer={demanderSuppression} />
+      <div className="tableau">
+        {/* Une colonne par status, chacune ne reçoit que ses tâches */}
+        {STATUTS.map((statut) => (
+          <ColonneStatut
+            key={statut.valeur}
+            statut={statut}
+            taches={taches.filter((t) => t.status === statut.valeur)}
+            onSupprimer={demanderSuppression}
+            onChangerStatus={changerStatus}
+            onModifier={enregistrerModification}
+          />
         ))}
-      </ul>
+      </div>
     )
   }
 
