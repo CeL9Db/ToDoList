@@ -10,3 +10,9 @@ export async function recupererTaches() {
   const reponse = await api.get('/todos')
   return reponse.data
 }
+
+// Envoie une nouvelle tâche au serveur et renvoie la tâche créée (avec son _id)
+export async function ajouterTache(tache) {
+  const reponse = await api.post('/todos', tache)
+  return reponse.data
+}
