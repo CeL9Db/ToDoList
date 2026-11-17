@@ -16,3 +16,15 @@ export async function ajouterTache(tache) {
   const reponse = await api.post('/todos', tache)
   return reponse.data
 }
+
+// Supprime définitivement une tâche à partir de son _id
+export async function supprimerTache(id) {
+  const reponse = await api.delete(`/todos/${id}`)
+  return reponse.data
+}
+
+// Même suppression, mais utilisable quand la page se ferme :
+// avec keepalive, le navigateur termine la requête même après la fermeture de l'onglet
+export function supprimerTacheAvantFermeture(id) {
+  fetch(`${api.defaults.baseURL}/todos/${id}`, { method: 'DELETE', keepalive: true })
+}

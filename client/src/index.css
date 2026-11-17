@@ -12,6 +12,9 @@
   --succes-clair: #e2f4eb;
   --danger: #c93c3c;
   --danger-clair: #fbeaea;
+  --notification-fond: #1c2030;
+  --notification-texte: #f5f6fa;
+  --notification-accent: #9aadff;
 
   --espace-1: 0.25rem;
   --espace-2: 0.5rem;
@@ -45,6 +48,9 @@
     --succes-clair: #1a3329;
     --danger: #f08080;
     --danger-clair: #3a2023;
+    --notification-fond: #eceef5;
+    --notification-texte: #1c2030;
+    --notification-accent: #3f58d0;
 
     --ombre: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.25);
     --ombre-survol: 0 2px 4px rgba(0, 0, 0, 0.35), 0 12px 28px rgba(0, 0, 0, 0.35);

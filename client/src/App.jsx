@@ -1,14 +1,27 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CircleAlert, Inbox, ListTodo, LoaderCircle, RefreshCw } from 'lucide-react'
-import { recupererTaches } from './services/api'
+import { recupererTaches, supprimerTache, supprimerTacheAvantFermeture } from './services/api'
 import CarteTache from './components/CarteTache'
 import FormulaireAjout from './components/FormulaireAjout'
+import Notification from './components/Notification'
 import './App.css'
+
+// Temps (en ms) pendant lequel on peut annuler une suppression
+const DUREE_ANNULATION = 5000
+
+// Range les tâches de la plus récente à la plus ancienne (même ordre que le serveur)
+function trierParDate(taches) {
+  return [...taches].sort((a, b) => new Date(b.date) - new Date(a.date))
+}
 
 function App() {
   const [taches, setTaches] = useState([])
   const [chargement, setChargement] = useState(true)
   const [erreur, setErreur] = useState('')
+  // Notification affichée en bas de l'écran (null = aucune)
+  const [notification, setNotification] = useState(null)
+  // Suppression en attente : la tâche retirée de l'écran et son minuteur
+  const suppressionEnAttente = useRef(null)
 
   // Demande les tâches au serveur et range le résultat dans l'état
   async function chargerTaches() {
@@ -37,6 +50,89 @@ function App() {
   // Une tâche vient d'être créée : on la met en haut de la liste, sans recharger la page
   function ajouterALaListe(tache) {
     setTaches((anciennes) => [tache, ...anciennes])
+  }
+
+  // Si l'onglet est fermé pendant les 5 secondes, on envoie quand même la suppression
+  useEffect(() => {
+    function avantFermeture() {
+      if (suppressionEnAttente.current) {
+        supprimerTacheAvantFermeture(suppressionEnAttente.current.tache._id)
+      }
+    }
+
+    window.addEventListener('pagehide', avantFermeture)
+    return () => window.removeEventListener('pagehide', avantFermeture)
+  }, [])
+
+  // Une notification sans bouton "Annuler" disparaît toute seule après quelques secondes
+  useEffect(() => {
+    if (!notification || notification.annulable) return
+    const minuteur = setTimeout(() => setNotification(null), DUREE_ANNULATION)
+    return () => clearTimeout(minuteur)
+  }, [notification])
+
+  // Remet une tâche dans la liste, à sa place d'origine grâce au tri par date
+  function remettreDansLaListe(tache) {
+    setTaches((anciennes) => trierParDate([...anciennes, tache]))
+  }
+
+  // Envoie au serveur la suppression qui était en attente
+  async function validerSuppression() {
+    const attente = suppressionEnAttente.current
+    if (!attente) return
+
+    clearTimeout(attente.minuteur)
+    suppressionEnAttente.current = null
+    // On cache la notification seulement si c'est encore celle de cette suppression
+    setNotification((actuelle) => (actuelle && actuelle.cle === attente.cle ? null : actuelle))
+
+    try {
+      await supprimerTache(attente.tache._id)
+    } catch {
+      // Le serveur n'a pas pu supprimer : la tâche revient à l'écran
+      remettreDansLaListe(attente.tache)
+      setNotification({
+        cle: Date.now(),
+        message: "La suppression a échoué, la tâche a été remise dans la liste.",
+        annulable: false,
+      })
+    }
+  }
+
+  // Clic sur la corbeille : la tâche disparaît tout de suite de l'écran,
+  // mais elle n'est vraiment supprimée sur le serveur qu'après 5 secondes
+  function demanderSuppression(tache) {
+    // Une seule suppression en attente à la fois : la précédente est validée maintenant
+    validerSuppression()
+
+    const cle = Date.now()
+    setTaches((anciennes) => anciennes.filter((t) => t._id !== tache._id))
+    suppressionEnAttente.current = {
+      tache,
+      cle,
+      minuteur: setTimeout(validerSuppression, DUREE_ANNULATION),
+    }
+    setNotification({ cle, message: `« ${tache.titre} » a été supprimée.`, annulable: true })
+  }
+
+  // Bouton "Annuler" : on arrête le minuteur et la tâche revient dans la liste
+  function annulerSuppression() {
+    const attente = suppressionEnAttente.current
+    if (!attente) return
+
+    clearTimeout(attente.minuteur)
+    suppressionEnAttente.current = null
+    remettreDansLaListe(attente.tache)
+    setNotification(null)
+  }
+
+  // Bouton "Fermer" : si une suppression attend, on la valide directement
+  function fermerNotification() {
+    if (notification?.annulable) {
+      validerSuppression()
+    } else {
+      setNotification(null)
+    }
   }
 
   // Choisit ce qu'il faut afficher : chargement, erreur, liste vide ou liste des tâches
@@ -77,7 +173,7 @@ function App() {
     return (
       <ul className="liste">
         {taches.map((tache) => (
-          <CarteTache key={tache._id} tache={tache} />
+          <CarteTache key={tache._id} tache={tache} onSupprimer={demanderSuppression} />
         ))}
       </ul>
     )
@@ -101,6 +197,17 @@ function App() {
         <FormulaireAjout onAjout={ajouterALaListe} />
         {afficherContenu()}
       </main>
+
+      {/* La clé change à chaque notification pour relancer l'animation de la barre */}
+      {notification && (
+        <Notification
+          key={notification.cle}
+          message={notification.message}
+          duree={DUREE_ANNULATION}
+          onAnnuler={notification.annulable ? annulerSuppression : null}
+          onFermer={fermerNotification}
+        />
+      )}
     </div>
   )
 }
