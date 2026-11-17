@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { CircleAlert, Inbox, ListTodo, LoaderCircle, RefreshCw } from 'lucide-react'
 import { recupererTaches } from './services/api'
 import CarteTache from './components/CarteTache'
+import FormulaireAjout from './components/FormulaireAjout'
 import './App.css'
 
 function App() {
@@ -31,6 +32,11 @@ function App() {
   function reessayer() {
     setChargement(true)
     chargerTaches()
+  }
+
+  // Une tâche vient d'être créée : on la met en haut de la liste, sans recharger la page
+  function ajouterALaListe(tache) {
+    setTaches((anciennes) => [tache, ...anciennes])
   }
 
   // Choisit ce qu'il faut afficher : chargement, erreur, liste vide ou liste des tâches
@@ -63,7 +69,7 @@ function App() {
         <div className="etat">
           <Inbox className="etat-icone" size={32} aria-hidden="true" />
           <p className="etat-titre">Aucune tâche pour le moment</p>
-          <p className="etat-texte">Les tâches ajoutées apparaîtront ici.</p>
+          <p className="etat-texte">Ajoutez votre première tâche avec le formulaire ci-dessus.</p>
         </div>
       )
     }
@@ -91,7 +97,10 @@ function App() {
         </div>
       </header>
 
-      <main>{afficherContenu()}</main>
+      <main>
+        <FormulaireAjout onAjout={ajouterALaListe} />
+        {afficherContenu()}
+      </main>
     </div>
   )
 }
