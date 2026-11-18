@@ -13,6 +13,8 @@
   --succes-clair: #e2f4eb;
   --danger: #c93c3c;
   --danger-clair: #fbeaea;
+  --attention: #b26a00;
+  --attention-clair: #fdf1de;
   --notification-fond: #1c2030;
   --notification-texte: #f5f6fa;
   --notification-accent: #9aadff;
@@ -50,6 +52,8 @@
     --succes-clair: #1a3329;
     --danger: #f08080;
     --danger-clair: #3a2023;
+    --attention: #f0b45a;
+    --attention-clair: #3a2e1a;
     --notification-fond: #eceef5;
     --notification-texte: #1c2030;
     --notification-accent: #3f58d0;

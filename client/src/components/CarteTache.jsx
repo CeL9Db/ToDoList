@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { Calendar, Check, ChevronLeft, ChevronRight, LoaderCircle, Pencil, Trash2, X } from 'lucide-react'
+import { Calendar, CalendarClock, Check, ChevronLeft, ChevronRight, Flag, LoaderCircle, Pencil, Trash2, X } from 'lucide-react'
 import { STATUTS } from '../statuts'
+import { PRIORITES, aujourdhui, echeanceEnTexte, estEnRetard, textePriorite } from '../priorites'
 
 // Transforme la date de la base en date lisible, par exemple "16 novembre 2026"
 function formaterDate(date) {
@@ -11,14 +12,28 @@ function formaterDate(date) {
   })
 }
 
+// Texte court de l'échéance, par exemple "Aujourd'hui" ou "20 nov. 2026"
+// timeZone UTC : l'échéance est enregistrée à minuit UTC, on garde donc le bon jour
+function formaterEcheance(echeance) {
+  if (echeanceEnTexte(echeance) === aujourdhui()) return "Aujourd'hui"
+  return new Date(echeance).toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  })
+}
+
 // Affiche une tâche : son titre, sa description et sa date
 // onSupprimer : clic sur la corbeille
 // onChangerStatus : clic sur une flèche, reçoit la tâche et le nouveau status
-// onModifier : enregistre le nouveau titre et la nouvelle description (renvoie une promesse)
+// onModifier : enregistre le titre, la description, la priorité et l'échéance (renvoie une promesse)
 function CarteTache({ tache, onSupprimer, onChangerStatus, onModifier }) {
   const [enEdition, setEnEdition] = useState(false)
   const [titre, setTitre] = useState(tache.titre)
   const [desc, setDesc] = useState(tache.desc || '')
+  const [priorite, setPriorite] = useState(tache.priorite || 'moyenne')
+  const [echeance, setEcheance] = useState(echeanceEnTexte(tache.echeance))
   const [envoi, setEnvoi] = useState(false)
   const [erreur, setErreur] = useState('')
   const champTitre = useRef(null)
@@ -47,6 +62,8 @@ function CarteTache({ tache, onSupprimer, onChangerStatus, onModifier }) {
     // On repart toujours des valeurs actuelles de la tâche
     setTitre(tache.titre)
     setDesc(tache.desc || '')
+    setPriorite(tache.priorite || 'moyenne')
+    setEcheance(echeanceEnTexte(tache.echeance))
     setErreur('')
     setEnEdition(true)
   }
@@ -67,7 +84,7 @@ function CarteTache({ tache, onSupprimer, onChangerStatus, onModifier }) {
 
     setEnvoi(true)
     try {
-      await onModifier(tache, { titre: titre.trim(), desc: desc.trim() })
+      await onModifier(tache, { titre: titre.trim(), desc: desc.trim(), priorite, echeance })
       fermerEdition()
     } catch (err) {
       setErreur(err.response?.data?.message || "Impossible d'enregistrer les modifications.")
@@ -113,6 +130,27 @@ function CarteTache({ tache, onSupprimer, onChangerStatus, onModifier }) {
             onChange={(e) => setDesc(e.target.value)}
           />
 
+          <div className="formulaire-options">
+            <label className="option">
+              <span className="option-nom">Priorité</span>
+              <select className="option-champ" value={priorite} onChange={(e) => setPriorite(e.target.value)}>
+                {PRIORITES.map((p) => (
+                  <option key={p.valeur} value={p.valeur}>{p.texte}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="option">
+              <span className="option-nom">Échéance</span>
+              <input
+                className="option-champ"
+                type="date"
+                value={echeance}
+                onChange={(e) => setEcheance(e.target.value)}
+              />
+            </label>
+          </div>
+
           {erreur && <p className="formulaire-erreur" role="alert">{erreur}</p>}
 
           <div className="carte-pied">
@@ -134,11 +172,32 @@ function CarteTache({ tache, onSupprimer, onChangerStatus, onModifier }) {
     )
   }
 
+  const enRetard = estEnRetard(tache)
+  const valeurPriorite = tache.priorite || 'moyenne'
+
   return (
-    <li className="carte">
+    <li className={enRetard ? 'carte carte-en-retard' : 'carte'}>
       <h3 className="carte-titre">{tache.titre}</h3>
 
       {tache.desc && <p className="carte-desc">{tache.desc}</p>}
+
+      {/* Petites étiquettes : la priorité et, s'il y en a une, l'échéance */}
+      <div className="carte-infos">
+        <span className={`badge priorite-${valeurPriorite}`}>
+          <Flag size={12} aria-hidden="true" />
+          {textePriorite(valeurPriorite)}
+          <span className="cache"> priorité</span>
+        </span>
+
+        {tache.echeance && (
+          <span className={enRetard ? 'badge badge-retard' : 'badge'}>
+            <CalendarClock size={12} aria-hidden="true" />
+            <span className="cache">Échéance : </span>
+            {formaterEcheance(tache.echeance)}
+            {enRetard && ' · en retard'}
+          </span>
+        )}
+      </div>
 
       <div className="carte-pied">
         <p className="carte-date">
