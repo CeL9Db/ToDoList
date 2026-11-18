@@ -711,3 +711,41 @@ kbd {
     bottom: var(--espace-3);
   }
 }
+
+/* Glisser-déposer : la carte se prend à la main, les colonnes montrent où la lâcher */
+.carte-deplacable {
+  cursor: grab;
+}
+
+.carte-deplacable:active {
+  cursor: grabbing;
+}
+
+.carte-glissee,
+.carte-glissee:hover {
+  opacity: 0.45;
+  box-shadow: none;
+  transform: none;
+}
+
+.colonne {
+  outline: 2px dashed transparent;
+  outline-offset: -2px;
+  transition: outline-color var(--transition), background var(--transition);
+}
+
+/* Colonnes où l'on peut déposer la carte en cours de déplacement */
+.colonne-cible {
+  outline-color: var(--bordure);
+}
+
+/* Colonne survolée : contour et fond de la couleur de la colonne */
+.colonne-survolee {
+  outline-color: var(--couleur-colonne);
+  background: var(--couleur-colonne-clair);
+}
+
+.colonne-cible .colonne-vide {
+  border-color: var(--couleur-colonne);
+  color: var(--couleur-colonne);
+}

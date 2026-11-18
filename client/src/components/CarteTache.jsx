@@ -28,7 +28,9 @@ function formaterEcheance(echeance) {
 // onSupprimer : clic sur la corbeille
 // onChangerStatus : clic sur une flèche, reçoit la tâche et le nouveau status
 // onModifier : enregistre le titre, la description, la priorité et l'échéance (renvoie une promesse)
-function CarteTache({ tache, onSupprimer, onChangerStatus, onModifier }) {
+// onDebutGlisser / onFinGlisser : préviennent le tableau qu'on commence ou arrête de glisser la carte
+function CarteTache({ tache, onSupprimer, onChangerStatus, onModifier, onDebutGlisser, onFinGlisser }) {
+  const [glissee, setGlissee] = useState(false)
   const [enEdition, setEnEdition] = useState(false)
   const [titre, setTitre] = useState(tache.titre)
   const [desc, setDesc] = useState(tache.desc || '')
@@ -100,6 +102,25 @@ function CarteTache({ tache, onSupprimer, onChangerStatus, onModifier }) {
     } else if (evenement.key === 'Enter' && !evenement.shiftKey && evenement.target.tagName === 'TEXTAREA') {
       enregistrer(evenement)
     }
+  }
+
+  // Début du glisser-déposer : on range l'id de la tâche dans le "colis" du navigateur
+  // (Firefox ne lance pas le glisser si aucune donnée n'est donnée)
+  function commencerGlisser(evenement) {
+    evenement.dataTransfer.setData('text/plain', tache._id)
+    evenement.dataTransfer.effectAllowed = 'move'
+    // On attend un instant avant de changer l'affichage : sinon Chrome
+    // photographie la carte déjà estompée pour l'image qui suit la souris
+    setTimeout(() => {
+      setGlissee(true)
+      onDebutGlisser(tache)
+    }, 0)
+  }
+
+  // Fin du glisser, que la carte ait été déposée ou non
+  function terminerGlisser() {
+    setGlissee(false)
+    onFinGlisser()
   }
 
   // Mode édition : la carte devient un petit formulaire
@@ -175,8 +196,14 @@ function CarteTache({ tache, onSupprimer, onChangerStatus, onModifier }) {
   const enRetard = estEnRetard(tache)
   const valeurPriorite = tache.priorite || 'moyenne'
 
+  let classes = 'carte carte-deplacable'
+  if (enRetard) classes += ' carte-en-retard'
+  if (glissee) classes += ' carte-glissee'
+
+  // La carte peut être glissée vers une autre colonne ; les flèches restent
+  // disponibles pour le clavier et les lecteurs d'écran
   return (
-    <li className={enRetard ? 'carte carte-en-retard' : 'carte'}>
+    <li className={classes} draggable="true" onDragStart={commencerGlisser} onDragEnd={terminerGlisser}>
       <h3 className="carte-titre">{tache.titre}</h3>
 
       {tache.desc && <p className="carte-desc">{tache.desc}</p>}
