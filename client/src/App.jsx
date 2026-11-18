@@ -28,6 +28,8 @@ function App() {
   // Texte recherché dans les titres et tri choisi (appliqués côté client)
   const [recherche, setRecherche] = useState('')
   const [tri, setTri] = useState('date')
+  // Tâche en train d'être glissée vers une autre colonne (null = aucune)
+  const [tacheGlissee, setTacheGlissee] = useState(null)
 
   // Demande les tâches au serveur et range le résultat dans l'état
   async function chargerTaches() {
@@ -77,6 +79,16 @@ function App() {
         message: "Le changement de status a échoué, la tâche est revenue à sa place.",
         annulable: false,
       })
+    }
+  }
+
+  // Une carte a été lâchée dans une colonne : on retrouve la tâche grâce à son id
+  // et on réutilise le même changement de status que les flèches
+  function deposerTache(id, nouveauStatus) {
+    setTacheGlissee(null)
+    const tache = taches.find((t) => t._id === id)
+    if (tache && tache.status !== nouveauStatus) {
+      changerStatus(tache, nouveauStatus)
     }
   }
 
@@ -229,9 +241,13 @@ function App() {
             key={statut.valeur}
             statut={statut}
             taches={tachesAffichees.filter((t) => t.status === statut.valeur)}
+            tacheGlissee={tacheGlissee}
             onSupprimer={demanderSuppression}
             onChangerStatus={changerStatus}
             onModifier={enregistrerModification}
+            onDebutGlisser={setTacheGlissee}
+            onFinGlisser={() => setTacheGlissee(null)}
+            onDeposer={deposerTache}
           />
         ))}
       </div>
