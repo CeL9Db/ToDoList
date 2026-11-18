@@ -591,6 +591,72 @@ kbd {
 }
 
 /* Écran moyen : les colonnes passent les unes sous les autres */
+/* Barre de recherche et de tri, entre le formulaire et le tableau */
+.barre-recherche {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espace-3);
+  margin-bottom: var(--espace-4);
+}
+
+.recherche {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 260px;
+}
+
+.recherche-icone {
+  position: absolute;
+  left: 0.85rem;
+  color: var(--texte-doux);
+  pointer-events: none;
+}
+
+.recherche-champ {
+  width: 100%;
+  padding: 0.6rem 2.6rem 0.6rem 2.5rem;
+  border: 1px solid var(--bordure);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--texte);
+  font: inherit;
+  box-shadow: var(--ombre);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.recherche-champ::placeholder {
+  color: var(--texte-doux);
+}
+
+.recherche-champ:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-clair), var(--ombre);
+}
+
+/* On cache la petite croix du navigateur, on a déjà notre bouton */
+.recherche-champ::-webkit-search-cancel-button {
+  display: none;
+}
+
+.recherche-effacer {
+  position: absolute;
+  right: 0.3rem;
+  width: 30px;
+  height: 30px;
+}
+
+.tri {
+  background: var(--surface);
+  box-shadow: var(--ombre);
+}
+
+.tri-icone {
+  color: var(--texte-doux);
+}
+
 @media (max-width: 860px) {
   .tableau {
     grid-template-columns: minmax(0, 1fr);
@@ -626,6 +692,14 @@ kbd {
 
   .formulaire-aide {
     display: none;
+  }
+
+  .tri {
+    width: 100%;
+  }
+
+  .tri .option-champ {
+    flex: 1;
   }
 
   .bouton-ajout {

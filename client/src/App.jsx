@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { CircleAlert, Inbox, ListTodo, LoaderCircle, RefreshCw } from 'lucide-react'
+import { CircleAlert, Inbox, ListTodo, LoaderCircle, RefreshCw, SearchX } from 'lucide-react'
 import { modifierTache, recupererTaches, supprimerTache, supprimerTacheAvantFermeture } from './services/api'
 import { STATUTS } from './statuts'
+import { filtrerParTitre, trierTaches } from './recherche'
+import BarreRecherche from './components/BarreRecherche'
 import ColonneStatut from './components/ColonneStatut'
 import FormulaireAjout from './components/FormulaireAjout'
 import Notification from './components/Notification'
@@ -23,6 +25,9 @@ function App() {
   const [notification, setNotification] = useState(null)
   // Suppression en attente : la tâche retirée de l'écran et son minuteur
   const suppressionEnAttente = useRef(null)
+  // Texte recherché dans les titres et tri choisi (appliqués côté client)
+  const [recherche, setRecherche] = useState('')
+  const [tri, setTri] = useState('date')
 
   // Demande les tâches au serveur et range le résultat dans l'état
   async function chargerTaches() {
@@ -165,6 +170,9 @@ function App() {
     }
   }
 
+  // Les tâches réellement affichées : filtrées par la recherche puis triées
+  const tachesAffichees = trierTaches(filtrerParTitre(taches, recherche), tri)
+
   // Choisit ce qu'il faut afficher : chargement, erreur, liste vide ou tableau des tâches
   function afficherContenu() {
     if (chargement) {
@@ -200,6 +208,19 @@ function App() {
       )
     }
 
+    if (tachesAffichees.length === 0) {
+      return (
+        <div className="etat">
+          <SearchX className="etat-icone" size={32} aria-hidden="true" />
+          <p className="etat-titre">Aucune tâche ne correspond à « {recherche.trim()} »</p>
+          <p className="etat-texte">Essayez avec un autre mot ou effacez la recherche.</p>
+          <button type="button" className="bouton" onClick={() => setRecherche('')}>
+            Effacer la recherche
+          </button>
+        </div>
+      )
+    }
+
     return (
       <div className="tableau">
         {/* Une colonne par status, chacune ne reçoit que ses tâches */}
@@ -207,7 +228,7 @@ function App() {
           <ColonneStatut
             key={statut.valeur}
             statut={statut}
-            taches={taches.filter((t) => t.status === statut.valeur)}
+            taches={tachesAffichees.filter((t) => t.status === statut.valeur)}
             onSupprimer={demanderSuppression}
             onChangerStatus={changerStatus}
             onModifier={enregistrerModification}
@@ -215,6 +236,13 @@ function App() {
         ))}
       </div>
     )
+  }
+
+  // Sous-titre de l'en-tête : "5 tâches", ou "2 sur 5 tâches" pendant une recherche
+  function texteNombreTaches() {
+    const total = `${taches.length} tâche${taches.length > 1 ? 's' : ''}`
+    if (recherche.trim() === '') return total
+    return `${tachesAffichees.length} sur ${total}`
   }
 
   return (
@@ -226,13 +254,17 @@ function App() {
         <div>
           <h1 className="entete-titre">Mes tâches</h1>
           <p className="entete-sous-titre">
-            {chargement || erreur ? 'ToDoList' : `${taches.length} tâche${taches.length > 1 ? 's' : ''}`}
+            {chargement || erreur ? 'ToDoList' : texteNombreTaches()}
           </p>
         </div>
       </header>
 
       <main>
         <FormulaireAjout onAjout={ajouterALaListe} />
+        {/* La barre n'a de sens que s'il y a des tâches à chercher */}
+        {!chargement && !erreur && taches.length > 0 && (
+          <BarreRecherche recherche={recherche} onRecherche={setRecherche} tri={tri} onTri={setTri} />
+        )}
         {afficherContenu()}
       </main>
 
