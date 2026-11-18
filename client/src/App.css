@@ -90,6 +90,47 @@
   white-space: nowrap;
 }
 
+/* Étiquettes de la carte : priorité et échéance */
+.carte-infos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-2);
+  margin-top: var(--espace-3);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espace-1);
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: var(--fond);
+  color: var(--texte-doux);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.priorite-moyenne {
+  background: var(--attention-clair);
+  color: var(--attention);
+}
+
+.priorite-haute {
+  background: var(--danger-clair);
+  color: var(--danger);
+}
+
+/* Tâche en retard : bordure rouge à gauche et échéance en rouge plein */
+.carte-en-retard {
+  border-left: 4px solid var(--danger);
+}
+
+.badge-retard {
+  background: var(--danger);
+  color: var(--surface);
+}
+
 /* Petit bouton rond qui ne contient qu'une icône */
 .bouton-icone {
   display: inline-flex;
@@ -361,6 +402,49 @@
   resize: vertical;
   min-height: 2.5rem;
   color: var(--texte-doux);
+}
+
+/* Ligne priorité + échéance sous les champs */
+.formulaire-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espace-2);
+  margin-top: var(--espace-2);
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espace-2);
+  padding: 0.2rem 0.3rem 0.2rem 0.7rem;
+  border: 1px solid var(--bordure);
+  border-radius: 999px;
+  background: var(--fond);
+  transition: border-color var(--transition);
+}
+
+.option:focus-within {
+  border-color: var(--accent);
+}
+
+.option-nom {
+  color: var(--texte-doux);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.option-champ {
+  padding: 0.2rem 0.4rem;
+  border: none;
+  border-radius: var(--rayon-petit);
+  background: transparent;
+  color: var(--texte);
+  font: inherit;
+  font-size: 0.85rem;
+}
+
+.option-champ:focus-visible {
+  outline: none;
 }
 
 .formulaire-pied {

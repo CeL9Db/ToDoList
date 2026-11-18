@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { LoaderCircle, Plus } from 'lucide-react'
 import { ajouterTache } from '../services/api'
+import { PRIORITES } from '../priorites'
 
-// Formulaire d'ajout rapide : un titre (obligatoire) et une description (facultative)
+// Formulaire d'ajout rapide : un titre (obligatoire), une description, une priorité et une échéance (facultatives)
 // onAjout est appelée avec la tâche créée pour mettre à jour la liste sans recharger la page
 function FormulaireAjout({ onAjout }) {
   const [titre, setTitre] = useState('')
   const [desc, setDesc] = useState('')
+  const [priorite, setPriorite] = useState('moyenne')
+  const [echeance, setEcheance] = useState('')
   const [envoi, setEnvoi] = useState(false)
   const [erreur, setErreur] = useState('')
   const champTitre = useRef(null)
@@ -42,11 +45,13 @@ function FormulaireAjout({ onAjout }) {
     setEnvoi(true)
     setErreur('')
     try {
-      const tache = await ajouterTache({ titre: titre.trim(), desc: desc.trim() })
+      const tache = await ajouterTache({ titre: titre.trim(), desc: desc.trim(), priorite, echeance })
       onAjout(tache)
       // On vide le formulaire et on reste dans le titre pour enchaîner les ajouts
       setTitre('')
       setDesc('')
+      setPriorite('moyenne')
+      setEcheance('')
       champTitre.current.focus()
     } catch (err) {
       setErreur(err.response?.data?.message || "Impossible d'ajouter la tâche. Vérifiez que le serveur est bien lancé.")
@@ -90,6 +95,28 @@ function FormulaireAjout({ onAjout }) {
           onChange={(e) => setDesc(e.target.value)}
           onKeyDown={toucheDescription}
         />
+      </div>
+
+      {/* Priorité et échéance, sur une même ligne */}
+      <div className="formulaire-options">
+        <label className="option">
+          <span className="option-nom">Priorité</span>
+          <select className="option-champ" value={priorite} onChange={(e) => setPriorite(e.target.value)}>
+            {PRIORITES.map((p) => (
+              <option key={p.valeur} value={p.valeur}>{p.texte}</option>
+            ))}
+          </select>
+        </label>
+
+        <label className="option">
+          <span className="option-nom">Échéance</span>
+          <input
+            className="option-champ"
+            type="date"
+            value={echeance}
+            onChange={(e) => setEcheance(e.target.value)}
+          />
+        </label>
       </div>
 
       <div className="formulaire-pied">

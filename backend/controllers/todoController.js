@@ -3,6 +3,16 @@ const Donnee = require('../model/donnee')
 
 // Les seules valeurs acceptées pour le champ status (les mêmes que dans le modèle)
 const STATUS_AUTORISES = Donnee.schema.path('status').enumValues
+const PRIORITES_AUTORISEES = Donnee.schema.path('priorite').enumValues
+
+// Vérifie l'échéance reçue : null ou '' pour l'enlever, sinon une date valide
+// Renvoie la valeur à enregistrer, ou undefined si la date est invalide
+function lireEcheance(echeance) {
+    if (echeance === null || echeance === '') return null
+    const date = new Date(echeance)
+    if (typeof echeance !== 'string' || isNaN(date.getTime())) return undefined
+    return date
+}
 
 // Renvoie toutes les tâches, de la plus récente à la plus ancienne
 async function listerTaches(req, res) {
@@ -15,10 +25,10 @@ async function listerTaches(req, res) {
     }
 }
 
-// Crée une nouvelle tâche à partir du titre, de la description et du status reçus
+// Crée une nouvelle tâche à partir du titre, de la description, du status, de la priorité et de l'échéance reçus
 async function creerTache(req, res) {
     // req.body peut être absent si la requête n'envoie pas de JSON
-    const { titre, desc, status } = req.body || {}
+    const { titre, desc, status, priorite, echeance } = req.body || {}
 
     // Le titre est obligatoire et ne doit pas être vide
     if (typeof titre !== 'string' || titre.trim() === '') {
@@ -30,8 +40,21 @@ async function creerTache(req, res) {
         return res.status(400).json({ message: 'Le status est invalide.' })
     }
 
+    if (priorite !== undefined && !PRIORITES_AUTORISEES.includes(priorite)) {
+        return res.status(400).json({ message: 'La priorité doit être basse, moyenne ou haute.' })
+    }
+
+    // L'échéance est facultative
+    let dateEcheance = null
+    if (echeance !== undefined) {
+        dateEcheance = lireEcheance(echeance)
+        if (dateEcheance === undefined) {
+            return res.status(400).json({ message: "La date d'échéance est invalide." })
+        }
+    }
+
     try {
-        const tache = await Donnee.create({ titre: titre.trim(), desc, status })
+        const tache = await Donnee.create({ titre: titre.trim(), desc, status, priorite, echeance: dateEcheance })
         res.status(201).json(tache)
     } catch (erreur) {
         console.error(erreur.message)
@@ -39,10 +62,10 @@ async function creerTache(req, res) {
     }
 }
 
-// Modifie une tâche existante : seuls les champs envoyés (titre, desc, status) changent
+// Modifie une tâche existante : seuls les champs envoyés (titre, desc, status, priorite, echeance) changent
 async function modifierTache(req, res) {
     const { id } = req.params
-    const { titre, desc, status } = req.body || {}
+    const { titre, desc, status, priorite, echeance } = req.body || {}
 
     // Un id mal formé ne peut correspondre à aucune tâche
     if (!mongoose.isValidObjectId(id)) {
@@ -58,11 +81,22 @@ async function modifierTache(req, res) {
         return res.status(400).json({ message: 'Le status est invalide.' })
     }
 
+    if (priorite !== undefined && !PRIORITES_AUTORISEES.includes(priorite)) {
+        return res.status(400).json({ message: 'La priorité doit être basse, moyenne ou haute.' })
+    }
+
     // On ne garde que les champs réellement envoyés
     const modifications = {}
     if (titre !== undefined) modifications.titre = titre.trim()
     if (desc !== undefined) modifications.desc = desc
     if (status !== undefined) modifications.status = status
+    if (priorite !== undefined) modifications.priorite = priorite
+    if (echeance !== undefined) {
+        modifications.echeance = lireEcheance(echeance)
+        if (modifications.echeance === undefined) {
+            return res.status(400).json({ message: "La date d'échéance est invalide." })
+        }
+    }
 
     try {
         // new: true renvoie la tâche après modification
