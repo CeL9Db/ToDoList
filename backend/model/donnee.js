@@ -20,7 +20,9 @@ const donnee = new mongoose.Schema(
         // Date limite facultative (null = pas d'échéance)
         echeance: {type: Date, default: null},
         // Les sous-tâches sont rangées directement dans le document de la tâche
-        sousTaches: {type: [sousTache], default: []}
+        sousTaches: {type: [sousTache], default: []},
+        // Étiquettes libres, par exemple ['travail', 'urgent'] (de simples textes)
+        etiquettes: {type: [String], default: []}
     }
 )
 

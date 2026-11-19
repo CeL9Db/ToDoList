@@ -890,3 +890,121 @@ kbd {
 .sous-taches .formulaire-erreur {
   margin-top: var(--espace-1);
 }
+
+/* Étiquettes : pastilles de couleur sur la carte et rangée de filtres au-dessus du tableau */
+.etiquette-couleur-0 { --etiquette-fond: var(--etiquette-0-fond); --etiquette-texte: var(--etiquette-0-texte); }
+.etiquette-couleur-1 { --etiquette-fond: var(--etiquette-1-fond); --etiquette-texte: var(--etiquette-1-texte); }
+.etiquette-couleur-2 { --etiquette-fond: var(--etiquette-2-fond); --etiquette-texte: var(--etiquette-2-texte); }
+.etiquette-couleur-3 { --etiquette-fond: var(--etiquette-3-fond); --etiquette-texte: var(--etiquette-3-texte); }
+.etiquette-couleur-4 { --etiquette-fond: var(--etiquette-4-fond); --etiquette-texte: var(--etiquette-4-texte); }
+.etiquette-couleur-5 { --etiquette-fond: var(--etiquette-5-fond); --etiquette-texte: var(--etiquette-5-texte); }
+
+.etiquettes {
+  margin-top: var(--espace-2);
+}
+
+.etiquettes-liste {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espace-1);
+}
+
+.etiquette {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: var(--etiquette-fond);
+  color: var(--etiquette-texte);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.etiquette-nom,
+.etiquette-enlever {
+  border: none;
+  background: transparent;
+  color: inherit;
+}
+
+.etiquette-nom {
+  padding: 0.12rem 0.2rem 0.12rem 0.6rem;
+  border-radius: 999px 0 0 999px;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.etiquette-nom::before {
+  content: '#';
+  opacity: 0.6;
+}
+
+.etiquette-enlever {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-right: 2px;
+  border-radius: 50%;
+  opacity: 0.6;
+  transition: opacity var(--transition), background var(--transition);
+}
+
+.etiquette-enlever:hover {
+  opacity: 1;
+  background: color-mix(in srgb, currentColor 15%, transparent);
+}
+
+/* Le bouton "+ Étiquette" reprend le style du bouton "+ Sous-tâche" */
+.etiquette-ouvrir {
+  margin-top: 0;
+}
+
+.etiquettes .formulaire-erreur {
+  margin-top: var(--espace-1);
+}
+
+.filtre-etiquettes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espace-2);
+  margin: calc(-1 * var(--espace-2)) 0 var(--espace-4);
+}
+
+.filtre-icone {
+  color: var(--texte-doux);
+}
+
+.filtre-pastille {
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--bordure);
+  border-radius: 999px;
+  background: var(--etiquette-fond, var(--surface));
+  color: var(--etiquette-texte, var(--texte-doux));
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+}
+
+.filtre-pastille:hover {
+  border-color: var(--etiquette-texte, var(--accent));
+}
+
+/* Pastille choisie : bordure de sa couleur et léger halo */
+.filtre-pastille[aria-pressed='true'] {
+  border-color: var(--etiquette-texte, var(--accent));
+  box-shadow: 0 0 0 2px var(--etiquette-fond, var(--accent-clair));
+  color: var(--etiquette-texte, var(--accent));
+}
+
+/* Le champ des étiquettes du formulaire prend la place qui reste */
+.option-etiquettes {
+  flex: 1 1 200px;
+}
+
+.option-etiquettes .option-champ {
+  flex: 1;
+  min-width: 0;
+}

@@ -3,7 +3,9 @@ import { CircleAlert, Inbox, ListTodo, LoaderCircle, RefreshCw, SearchX } from '
 import { modifierTache, recupererTaches, supprimerTache, supprimerTacheAvantFermeture } from './services/api'
 import { STATUTS } from './statuts'
 import { filtrerParTitre, trierTaches } from './recherche'
+import { filtrerParEtiquette, toutesLesEtiquettes } from './etiquettes'
 import BarreRecherche from './components/BarreRecherche'
+import FiltreEtiquettes from './components/FiltreEtiquettes'
 import ColonneStatut from './components/ColonneStatut'
 import FormulaireAjout from './components/FormulaireAjout'
 import Notification from './components/Notification'
@@ -28,6 +30,8 @@ function App() {
   // Texte recherché dans les titres et tri choisi (appliqués côté client)
   const [recherche, setRecherche] = useState('')
   const [tri, setTri] = useState('date')
+  // Étiquette choisie pour filtrer le tableau ('' = toutes les tâches)
+  const [etiquetteChoisie, setEtiquetteChoisie] = useState('')
   // Tâche en train d'être glissée vers une autre colonne (null = aucune)
   const [tacheGlissee, setTacheGlissee] = useState(null)
 
@@ -182,8 +186,29 @@ function App() {
     }
   }
 
-  // Les tâches réellement affichées : filtrées par la recherche puis triées
-  const tachesAffichees = trierTaches(filtrerParTitre(taches, recherche), tri)
+  // Toutes les étiquettes existantes, pour la rangée de filtres
+  const listeEtiquettes = toutesLesEtiquettes(taches)
+  // Si plus aucune tâche n'a l'étiquette choisie (elle a été enlevée), le filtre ne s'applique plus
+  const etiquetteActive = listeEtiquettes.includes(etiquetteChoisie) ? etiquetteChoisie : ''
+  const filtreActif = recherche.trim() !== '' || etiquetteActive !== ''
+
+  // Les tâches réellement affichées : filtrées par la recherche et l'étiquette, puis triées
+  const tachesAffichees = trierTaches(filtrerParEtiquette(filtrerParTitre(taches, recherche), etiquetteActive), tri)
+
+  // Bouton "Effacer les filtres" quand plus rien ne s'affiche
+  function effacerFiltres() {
+    setRecherche('')
+    setEtiquetteChoisie('')
+  }
+
+  // Phrase affichée quand les filtres ne laissent aucune tâche
+  function texteAucunResultat() {
+    if (recherche.trim() !== '' && etiquetteActive !== '') {
+      return `Aucune tâche « ${etiquetteActive} » ne correspond à « ${recherche.trim()} »`
+    }
+    if (etiquetteActive !== '') return `Aucune tâche avec l'étiquette « ${etiquetteActive} »`
+    return `Aucune tâche ne correspond à « ${recherche.trim()} »`
+  }
 
   // Choisit ce qu'il faut afficher : chargement, erreur, liste vide ou tableau des tâches
   function afficherContenu() {
@@ -224,10 +249,10 @@ function App() {
       return (
         <div className="etat">
           <SearchX className="etat-icone" size={32} aria-hidden="true" />
-          <p className="etat-titre">Aucune tâche ne correspond à « {recherche.trim()} »</p>
-          <p className="etat-texte">Essayez avec un autre mot ou effacez la recherche.</p>
-          <button type="button" className="bouton" onClick={() => setRecherche('')}>
-            Effacer la recherche
+          <p className="etat-titre">{texteAucunResultat()}</p>
+          <p className="etat-texte">Essayez avec un autre mot ou effacez les filtres.</p>
+          <button type="button" className="bouton" onClick={effacerFiltres}>
+            Effacer les filtres
           </button>
         </div>
       )
@@ -249,16 +274,17 @@ function App() {
             onFinGlisser={() => setTacheGlissee(null)}
             onDeposer={deposerTache}
             onMiseAJour={remplacerDansLaListe}
+            onFiltrerEtiquette={setEtiquetteChoisie}
           />
         ))}
       </div>
     )
   }
 
-  // Sous-titre de l'en-tête : "5 tâches", ou "2 sur 5 tâches" pendant une recherche
+  // Sous-titre de l'en-tête : "5 tâches", ou "2 sur 5 tâches" pendant une recherche ou un filtre
   function texteNombreTaches() {
     const total = `${taches.length} tâche${taches.length > 1 ? 's' : ''}`
-    if (recherche.trim() === '') return total
+    if (!filtreActif) return total
     return `${tachesAffichees.length} sur ${total}`
   }
 
@@ -280,7 +306,14 @@ function App() {
         <FormulaireAjout onAjout={ajouterALaListe} />
         {/* La barre n'a de sens que s'il y a des tâches à chercher */}
         {!chargement && !erreur && taches.length > 0 && (
-          <BarreRecherche recherche={recherche} onRecherche={setRecherche} tri={tri} onTri={setTri} />
+          <>
+            <BarreRecherche recherche={recherche} onRecherche={setRecherche} tri={tri} onTri={setTri} />
+            <FiltreEtiquettes
+              etiquettes={listeEtiquettes}
+              etiquetteChoisie={etiquetteActive}
+              onChoisir={setEtiquetteChoisie}
+            />
+          </>
         )}
         {afficherContenu()}
       </main>

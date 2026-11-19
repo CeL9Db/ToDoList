@@ -2,14 +2,18 @@ import { useEffect, useRef, useState } from 'react'
 import { LoaderCircle, Plus } from 'lucide-react'
 import { ajouterTache } from '../services/api'
 import { PRIORITES } from '../priorites'
+import { lireListeEtiquettes } from '../etiquettes'
 
-// Formulaire d'ajout rapide : un titre (obligatoire), une description, une priorité et une échéance (facultatives)
+// Formulaire d'ajout rapide : un titre (obligatoire), une description, une priorité,
+// une échéance et des étiquettes (facultatives)
 // onAjout est appelée avec la tâche créée pour mettre à jour la liste sans recharger la page
 function FormulaireAjout({ onAjout }) {
   const [titre, setTitre] = useState('')
   const [desc, setDesc] = useState('')
   const [priorite, setPriorite] = useState('moyenne')
   const [echeance, setEcheance] = useState('')
+  // Les étiquettes sont tapées à la suite, séparées par des virgules
+  const [etiquettes, setEtiquettes] = useState('')
   const [envoi, setEnvoi] = useState(false)
   const [erreur, setErreur] = useState('')
   const champTitre = useRef(null)
@@ -45,13 +49,20 @@ function FormulaireAjout({ onAjout }) {
     setEnvoi(true)
     setErreur('')
     try {
-      const tache = await ajouterTache({ titre: titre.trim(), desc: desc.trim(), priorite, echeance })
+      const tache = await ajouterTache({
+        titre: titre.trim(),
+        desc: desc.trim(),
+        priorite,
+        echeance,
+        etiquettes: lireListeEtiquettes(etiquettes),
+      })
       onAjout(tache)
       // On vide le formulaire et on reste dans le titre pour enchaîner les ajouts
       setTitre('')
       setDesc('')
       setPriorite('moyenne')
       setEcheance('')
+      setEtiquettes('')
       champTitre.current.focus()
     } catch (err) {
       setErreur(err.response?.data?.message || "Impossible d'ajouter la tâche. Vérifiez que le serveur est bien lancé.")
@@ -115,6 +126,18 @@ function FormulaireAjout({ onAjout }) {
             type="date"
             value={echeance}
             onChange={(e) => setEcheance(e.target.value)}
+          />
+        </label>
+
+        <label className="option option-etiquettes">
+          <span className="option-nom">Étiquettes</span>
+          <input
+            className="option-champ"
+            type="text"
+            placeholder="travail, perso..."
+            value={etiquettes}
+            onChange={(e) => setEtiquettes(e.target.value)}
+            autoComplete="off"
           />
         </label>
       </div>

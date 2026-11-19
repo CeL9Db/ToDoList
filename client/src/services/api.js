@@ -17,7 +17,7 @@ export async function ajouterTache(tache) {
   return reponse.data
 }
 
-// Modifie une tâche (titre, desc ou status) et renvoie la tâche mise à jour
+// Modifie une tâche (titre, desc, status, priorité, échéance ou étiquettes) et renvoie la tâche mise à jour
 export async function modifierTache(id, modifications) {
   const reponse = await api.put(`/todos/${id}`, modifications)
   return reponse.data
