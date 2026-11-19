@@ -749,3 +749,144 @@ kbd {
   border-color: var(--couleur-colonne);
   color: var(--couleur-colonne);
 }
+
+/* Sous-tâches : barre de progression, petites cases à cocher et champ d'ajout */
+.sous-taches {
+  margin-top: var(--espace-3);
+}
+
+.progression {
+  display: flex;
+  align-items: center;
+  gap: var(--espace-2);
+}
+
+.progression-barre {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--fond);
+  overflow: hidden;
+}
+
+.progression-remplie {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: width 0.3s ease, background var(--transition);
+}
+
+/* Toutes les sous-tâches sont faites : la barre passe au vert */
+.progression-complete {
+  background: var(--succes);
+}
+
+.progression-texte {
+  color: var(--texte-doux);
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.sous-taches-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: var(--espace-2);
+}
+
+.sous-tache {
+  display: flex;
+  align-items: center;
+  gap: var(--espace-1);
+  border-radius: var(--rayon-petit);
+  transition: background var(--transition);
+}
+
+.sous-tache:hover {
+  background: var(--fond);
+}
+
+.sous-tache-case {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espace-2);
+  padding: 0.3rem var(--espace-2);
+  font-size: 0.9rem;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.sous-tache-case input {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin: 0.15rem 0 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+/* Sous-tâche cochée : texte barré et plus clair */
+.sous-tache-faite span {
+  color: var(--texte-doux);
+  text-decoration: line-through;
+}
+
+.sous-tache-supprimer {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+/* Petit bouton "+ Sous-tâche", discret sous la liste */
+.sous-tache-ouvrir {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espace-1);
+  margin-top: var(--espace-2);
+  padding: 0.2rem 0.5rem;
+  border: 1px dashed var(--bordure);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--texte-doux);
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition: border-color var(--transition), color var(--transition), background var(--transition);
+}
+
+.sous-tache-ouvrir:hover {
+  border-color: var(--accent);
+  background: var(--accent-clair);
+  color: var(--accent);
+}
+
+.sous-tache-ajout {
+  display: flex;
+  align-items: center;
+  gap: var(--espace-1);
+  margin-top: var(--espace-2);
+}
+
+.sous-tache-champ {
+  flex: 1;
+  min-width: 0;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon-petit);
+  background: var(--surface);
+  color: var(--texte);
+  font: inherit;
+  font-size: 0.9rem;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.sous-tache-champ:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-clair);
+}
+
+.sous-taches .formulaire-erreur {
+  margin-top: var(--espace-1);
+}

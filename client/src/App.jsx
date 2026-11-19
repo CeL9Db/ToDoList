@@ -248,6 +248,7 @@ function App() {
             onDebutGlisser={setTacheGlissee}
             onFinGlisser={() => setTacheGlissee(null)}
             onDeposer={deposerTache}
+            onMiseAJour={remplacerDansLaListe}
           />
         ))}
       </div>
