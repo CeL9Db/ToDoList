@@ -34,3 +34,21 @@ export async function supprimerTache(id) {
 export function supprimerTacheAvantFermeture(id) {
   fetch(`${api.defaults.baseURL}/todos/${id}`, { method: 'DELETE', keepalive: true })
 }
+
+// Ajoute une sous-tâche à la tâche et renvoie la tâche mise à jour
+export async function ajouterSousTache(id, texte) {
+  const reponse = await api.post(`/todos/${id}/sous-taches`, { texte })
+  return reponse.data
+}
+
+// Modifie une sous-tâche (fait et/ou texte) et renvoie la tâche mise à jour
+export async function modifierSousTache(id, idSousTache, modifications) {
+  const reponse = await api.put(`/todos/${id}/sous-taches/${idSousTache}`, modifications)
+  return reponse.data
+}
+
+// Supprime une sous-tâche et renvoie la tâche mise à jour
+export async function supprimerSousTache(id, idSousTache) {
+  const reponse = await api.delete(`/todos/${id}/sous-taches/${idSousTache}`)
+  return reponse.data
+}

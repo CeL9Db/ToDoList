@@ -5,6 +5,7 @@ import CarteTache from './CarteTache'
 // statut : un élément de STATUTS (valeur + classe CSS)
 // taches : uniquement les tâches qui ont ce status
 // tacheGlissee : la tâche en train d'être glissée (null si aucune)
+// onMiseAJour : remplace une tâche dans la liste après un changement de ses sous-tâches
 // onDeposer : appelé quand une carte est lâchée ici, reçoit l'id de la tâche et le status de la colonne
 function ColonneStatut({
   statut,
@@ -16,6 +17,7 @@ function ColonneStatut({
   onDebutGlisser,
   onFinGlisser,
   onDeposer,
+  onMiseAJour,
 }) {
   const idTitre = `colonne-${statut.classe}`
   // true quand une carte est au-dessus de la colonne
@@ -80,6 +82,7 @@ function ColonneStatut({
               onModifier={onModifier}
               onDebutGlisser={onDebutGlisser}
               onFinGlisser={onFinGlisser}
+              onMiseAJour={onMiseAJour}
             />
           ))}
         </ul>
