@@ -14,6 +14,34 @@ function lireEcheance(echeance) {
     return date
 }
 
+// Limites des étiquettes : nombre maximum par tâche et longueur maximum d'une étiquette
+const MAX_ETIQUETTES = 10
+const LONGUEUR_MAX_ETIQUETTE = 30
+
+// Vérifie les étiquettes reçues : il faut un tableau de textes
+// Les espaces autour sont enlevés, tout passe en minuscules et les doublons sont retirés
+// Renvoie le tableau nettoyé, ou un texte d'erreur si quelque chose ne va pas
+function lireEtiquettes(etiquettes) {
+    if (!Array.isArray(etiquettes) || etiquettes.some((e) => typeof e !== 'string')) {
+        return 'Les étiquettes doivent être une liste de textes.'
+    }
+
+    const propres = []
+    for (const etiquette of etiquettes) {
+        const texte = etiquette.trim().toLowerCase()
+        if (texte === '') continue
+        if (texte.length > LONGUEUR_MAX_ETIQUETTE) {
+            return `Une étiquette ne peut pas dépasser ${LONGUEUR_MAX_ETIQUETTE} caractères.`
+        }
+        if (!propres.includes(texte)) propres.push(texte)
+    }
+
+    if (propres.length > MAX_ETIQUETTES) {
+        return `Une tâche ne peut pas avoir plus de ${MAX_ETIQUETTES} étiquettes.`
+    }
+    return propres
+}
+
 // Renvoie toutes les tâches, de la plus récente à la plus ancienne
 async function listerTaches(req, res) {
     try {
@@ -25,10 +53,11 @@ async function listerTaches(req, res) {
     }
 }
 
-// Crée une nouvelle tâche à partir du titre, de la description, du status, de la priorité et de l'échéance reçus
+// Crée une nouvelle tâche à partir du titre, de la description, du status, de la priorité,
+// de l'échéance et des étiquettes reçus
 async function creerTache(req, res) {
     // req.body peut être absent si la requête n'envoie pas de JSON
-    const { titre, desc, status, priorite, echeance } = req.body || {}
+    const { titre, desc, status, priorite, echeance, etiquettes } = req.body || {}
 
     // Le titre est obligatoire et ne doit pas être vide
     if (typeof titre !== 'string' || titre.trim() === '') {
@@ -53,8 +82,24 @@ async function creerTache(req, res) {
         }
     }
 
+    // Les étiquettes sont facultatives (liste vide par défaut)
+    let listeEtiquettes = []
+    if (etiquettes !== undefined) {
+        listeEtiquettes = lireEtiquettes(etiquettes)
+        if (typeof listeEtiquettes === 'string') {
+            return res.status(400).json({ message: listeEtiquettes })
+        }
+    }
+
     try {
-        const tache = await Donnee.create({ titre: titre.trim(), desc, status, priorite, echeance: dateEcheance })
+        const tache = await Donnee.create({
+            titre: titre.trim(),
+            desc,
+            status,
+            priorite,
+            echeance: dateEcheance,
+            etiquettes: listeEtiquettes
+        })
         res.status(201).json(tache)
     } catch (erreur) {
         console.error(erreur.message)
@@ -62,10 +107,10 @@ async function creerTache(req, res) {
     }
 }
 
-// Modifie une tâche existante : seuls les champs envoyés (titre, desc, status, priorite, echeance) changent
+// Modifie une tâche existante : seuls les champs envoyés (titre, desc, status, priorite, echeance, etiquettes) changent
 async function modifierTache(req, res) {
     const { id } = req.params
-    const { titre, desc, status, priorite, echeance } = req.body || {}
+    const { titre, desc, status, priorite, echeance, etiquettes } = req.body || {}
 
     // Un id mal formé ne peut correspondre à aucune tâche
     if (!mongoose.isValidObjectId(id)) {
@@ -95,6 +140,13 @@ async function modifierTache(req, res) {
         modifications.echeance = lireEcheance(echeance)
         if (modifications.echeance === undefined) {
             return res.status(400).json({ message: "La date d'échéance est invalide." })
+        }
+    }
+    // On envoie toujours la liste complète des étiquettes (après un ajout ou une suppression)
+    if (etiquettes !== undefined) {
+        modifications.etiquettes = lireEtiquettes(etiquettes)
+        if (typeof modifications.etiquettes === 'string') {
+            return res.status(400).json({ message: modifications.etiquettes })
         }
     }
 

@@ -19,6 +19,20 @@
   --notification-texte: #f5f6fa;
   --notification-accent: #9aadff;
 
+  /* Six couleurs douces pour les étiquettes : fond et texte */
+  --etiquette-0-fond: #e6effd;
+  --etiquette-0-texte: #2f5fb3;
+  --etiquette-1-fond: #e3f5ee;
+  --etiquette-1-texte: #1d7a52;
+  --etiquette-2-fond: #fdeee3;
+  --etiquette-2-texte: #a2531c;
+  --etiquette-3-fond: #f3e9fc;
+  --etiquette-3-texte: #7a43b0;
+  --etiquette-4-fond: #fce8ef;
+  --etiquette-4-texte: #b23a65;
+  --etiquette-5-fond: #e4f4f7;
+  --etiquette-5-texte: #1b7385;
+
   --espace-1: 0.25rem;
   --espace-2: 0.5rem;
   --espace-3: 1rem;
@@ -57,6 +71,19 @@
     --notification-fond: #eceef5;
     --notification-texte: #1c2030;
     --notification-accent: #3f58d0;
+
+    --etiquette-0-fond: #1f2c47;
+    --etiquette-0-texte: #93b6f5;
+    --etiquette-1-fond: #1a3329;
+    --etiquette-1-texte: #79d3a8;
+    --etiquette-2-fond: #3a2a1d;
+    --etiquette-2-texte: #f2b27f;
+    --etiquette-3-fond: #2e2340;
+    --etiquette-3-texte: #c9a3f0;
+    --etiquette-4-fond: #3a1f2a;
+    --etiquette-4-texte: #f29bbb;
+    --etiquette-5-fond: #193339;
+    --etiquette-5-texte: #7fd0df;
 
     --ombre: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.25);
     --ombre-survol: 0 2px 4px rgba(0, 0, 0, 0.35), 0 12px 28px rgba(0, 0, 0, 0.35);

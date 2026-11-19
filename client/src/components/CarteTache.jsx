@@ -3,6 +3,7 @@ import { Calendar, CalendarClock, Check, ChevronLeft, ChevronRight, Flag, Loader
 import { STATUTS } from '../statuts'
 import { PRIORITES, aujourdhui, echeanceEnTexte, estEnRetard, textePriorite } from '../priorites'
 import SousTaches from './SousTaches'
+import Etiquettes from './Etiquettes'
 
 // Transforme la date de la base en date lisible, par exemple "16 novembre 2026"
 function formaterDate(date) {
@@ -30,12 +31,23 @@ function formaterEcheance(echeance) {
 // onChangerStatus : clic sur une flèche, reçoit la tâche et le nouveau status
 // onModifier : enregistre le titre, la description, la priorité et l'échéance (renvoie une promesse)
 // onDebutGlisser / onFinGlisser : préviennent le tableau qu'on commence ou arrête de glisser la carte
-// onMiseAJour : remplace la tâche dans la liste (utilisé par les sous-tâches)
-function CarteTache({ tache, onSupprimer, onChangerStatus, onModifier, onDebutGlisser, onFinGlisser, onMiseAJour }) {
+// onMiseAJour : remplace la tâche dans la liste (utilisé par les sous-tâches et les étiquettes)
+// onFiltrerEtiquette : clic sur une étiquette, pour filtrer le tableau
+function CarteTache({
+  tache,
+  onSupprimer,
+  onChangerStatus,
+  onModifier,
+  onDebutGlisser,
+  onFinGlisser,
+  onMiseAJour,
+  onFiltrerEtiquette,
+}) {
   const [glissee, setGlissee] = useState(false)
-  // true pendant qu'on écrit une sous-tâche : la carte n'est alors plus déplaçable,
+  // true pendant qu'on écrit une sous-tâche ou une étiquette : la carte n'est alors plus déplaçable,
   // sinon le navigateur confond la sélection du texte avec un glisser-déposer
   const [saisieSousTache, setSaisieSousTache] = useState(false)
+  const [saisieEtiquette, setSaisieEtiquette] = useState(false)
   const [enEdition, setEnEdition] = useState(false)
   const [titre, setTitre] = useState(tache.titre)
   const [desc, setDesc] = useState(tache.desc || '')
@@ -72,8 +84,9 @@ function CarteTache({ tache, onSupprimer, onChangerStatus, onModifier, onDebutGl
     setPriorite(tache.priorite || 'moyenne')
     setEcheance(echeanceEnTexte(tache.echeance))
     setErreur('')
-    // Le champ des sous-tâches disparaît pendant l'édition
+    // Les champs des sous-tâches et des étiquettes disparaissent pendant l'édition
     setSaisieSousTache(false)
+    setSaisieEtiquette(false)
     setEnEdition(true)
   }
 
@@ -210,7 +223,7 @@ function CarteTache({ tache, onSupprimer, onChangerStatus, onModifier, onDebutGl
   // La carte peut être glissée vers une autre colonne ; les flèches restent
   // disponibles pour le clavier et les lecteurs d'écran
   return (
-    <li className={classes} draggable={!saisieSousTache} onDragStart={commencerGlisser} onDragEnd={terminerGlisser}>
+    <li className={classes} draggable={!saisieSousTache && !saisieEtiquette} onDragStart={commencerGlisser} onDragEnd={terminerGlisser}>
       <h3 className="carte-titre">{tache.titre}</h3>
 
       {tache.desc && <p className="carte-desc">{tache.desc}</p>}
@@ -232,6 +245,13 @@ function CarteTache({ tache, onSupprimer, onChangerStatus, onModifier, onDebutGl
           </span>
         )}
       </div>
+
+      <Etiquettes
+        tache={tache}
+        onMiseAJour={onMiseAJour}
+        onSaisie={setSaisieEtiquette}
+        onFiltrer={onFiltrerEtiquette}
+      />
 
       <SousTaches tache={tache} onMiseAJour={onMiseAJour} onSaisie={setSaisieSousTache} />
 
