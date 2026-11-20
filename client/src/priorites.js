@@ -13,12 +13,18 @@ export function textePriorite(valeur) {
   return priorite.texte
 }
 
-// La date du jour au format "AAAA-MM-JJ" (le format des champs <input type="date">)
+// La date dans "nombreDeJours" jours au format "AAAA-MM-JJ" (le format des champs <input type="date">)
+export function dateDansJours(nombreDeJours) {
+  const date = new Date()
+  date.setDate(date.getDate() + nombreDeJours)
+  const mois = String(date.getMonth() + 1).padStart(2, '0')
+  const jour = String(date.getDate()).padStart(2, '0')
+  return `${date.getFullYear()}-${mois}-${jour}`
+}
+
+// La date du jour au format "AAAA-MM-JJ"
 export function aujourdhui() {
-  const maintenant = new Date()
-  const mois = String(maintenant.getMonth() + 1).padStart(2, '0')
-  const jour = String(maintenant.getDate()).padStart(2, '0')
-  return `${maintenant.getFullYear()}-${mois}-${jour}`
+  return dateDansJours(0)
 }
 
 // Transforme l'échéance de la base en "AAAA-MM-JJ" ('' s'il n'y en a pas)
