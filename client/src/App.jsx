@@ -11,6 +11,7 @@ import MatriceEisenhower from './components/MatriceEisenhower'
 import ChoixVue from './components/ChoixVue'
 import FormulaireAjout from './components/FormulaireAjout'
 import Notification from './components/Notification'
+import PanneauStatistiques from './components/PanneauStatistiques'
 import './App.css'
 
 // Temps (en ms) pendant lequel on peut annuler une suppression
@@ -326,6 +327,8 @@ function App() {
         {/* La barre n'a de sens que s'il y a des tâches à chercher */}
         {!chargement && !erreur && taches.length > 0 && (
           <>
+            {/* Les statistiques portent sur toutes les tâches, pas seulement celles filtrées */}
+            <PanneauStatistiques taches={taches} />
             <BarreRecherche recherche={recherche} onRecherche={setRecherche} tri={tri} onTri={setTri} />
             <FiltreEtiquettes
               etiquettes={listeEtiquettes}
