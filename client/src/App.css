@@ -75,9 +75,10 @@
 
 .carte-pied {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: var(--espace-3);
+  gap: var(--espace-2) var(--espace-3);
   margin-top: var(--espace-3);
 }
 
@@ -150,9 +151,10 @@
   color: var(--texte);
 }
 
-/* Groupe de boutons en bas à droite de la carte */
+/* Groupe de boutons en bas à droite de la carte (passe à la ligne si la carte est étroite) */
 .carte-actions {
   display: flex;
+  margin-left: auto;
   align-items: center;
   gap: 2px;
 }
@@ -889,6 +891,99 @@ kbd {
 
 .sous-taches .formulaire-erreur {
   margin-top: var(--espace-1);
+}
+
+/* Bouton d'historique ouvert : il reste visible et prend la couleur d'accent */
+.carte .bouton-actif,
+.carte .bouton-actif:hover {
+  opacity: 1;
+  background: var(--accent-clair);
+  color: var(--accent);
+}
+
+/* Historique d'une tâche : petite frise verticale, la plus récente en haut */
+.historique {
+  margin-top: var(--espace-3);
+  padding: var(--espace-2) var(--espace-3);
+  border-radius: var(--rayon-petit);
+  background: var(--fond);
+  animation: apparition-historique 0.2s ease;
+}
+
+@keyframes apparition-historique {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.historique-liste {
+  max-height: 180px;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.historique-ligne {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espace-2);
+  padding: 0.3rem 0;
+}
+
+/* Trait vertical qui relie les pastilles entre elles */
+.historique-ligne:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: 1.6rem;
+  bottom: -0.3rem;
+  left: 10px;
+  width: 2px;
+  background: var(--bordure);
+}
+
+.historique-icone {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--texte-doux);
+  box-shadow: 0 0 0 1px var(--bordure);
+}
+
+.historique-creation .historique-icone {
+  background: var(--accent-clair);
+  color: var(--accent);
+}
+
+.historique-status .historique-icone {
+  background: var(--succes-clair);
+  color: var(--succes);
+}
+
+.historique-texte {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+}
+
+.historique-texte time {
+  color: var(--texte-doux);
+  font-size: 0.74rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .historique {
+    animation: none;
+  }
 }
 
 /* Étiquettes : pastilles de couleur sur la carte et rangée de filtres au-dessus du tableau */

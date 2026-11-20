@@ -9,6 +9,19 @@ const sousTache = new mongoose.Schema(
     }
 )
 
+// Une ligne de l'historique : ce qui s'est passé et quand
+// action vaut 'creation', 'status' (changement de colonne) ou 'modification' (titre, description...)
+// detail donne une précision, par exemple "List → Fini avec succès !" ou "titre, priorité"
+// _id: false car on n'a jamais besoin de retrouver une ligne précise
+const action = new mongoose.Schema(
+    {
+        action: {type: String, required: true, enum: ['creation', 'status', 'modification']},
+        detail: {type: String, default: ''},
+        date: {type: Date, default: Date.now}
+    },
+    {_id: false}
+)
+
 const donnee = new mongoose.Schema(
     {
         titre : {type: String, required: true},
@@ -24,7 +37,9 @@ const donnee = new mongoose.Schema(
         // Étiquettes libres, par exemple ['travail', 'urgent'] (de simples textes)
         etiquettes: {type: [String], default: []},
         // Date à laquelle la tâche est passée à 'Fini avec succès !' (null tant qu'elle n'est pas finie)
-        dateFin: {type: Date, default: null}
+        dateFin: {type: Date, default: null},
+        // Historique des actions sur la tâche, de la plus ancienne à la plus récente
+        historique: {type: [action], default: []}
     }
 )
 
