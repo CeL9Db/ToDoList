@@ -16,6 +16,50 @@ function lireEcheance(echeance) {
     return date
 }
 
+// Nombre maximum de lignes gardées dans l'historique d'une tâche (les plus anciennes partent)
+const MAX_HISTORIQUE = 50
+
+// Noms des champs tels qu'ils sont affichés dans l'historique
+const NOMS_CHAMPS = {
+    titre: 'titre',
+    desc: 'description',
+    priorite: 'priorité',
+    echeance: 'échéance',
+    etiquettes: 'étiquettes'
+}
+
+// Transforme une valeur en texte pour pouvoir comparer l'ancienne et la nouvelle
+// (une date devient un nombre, un tableau devient "a,b", rien devient '')
+function enTexte(valeur) {
+    if (valeur === null || valeur === undefined) return ''
+    if (valeur instanceof Date) return String(valeur.getTime())
+    if (Array.isArray(valeur)) return valeur.join(',')
+    return String(valeur)
+}
+
+// Compare l'ancienne tâche et les modifications demandées
+// Renvoie les lignes à ajouter à l'historique (tableau vide si rien n'a vraiment changé)
+function actionsHistorique(ancienne, modifications) {
+    const actions = []
+    const maintenant = new Date()
+
+    if (modifications.status !== undefined && modifications.status !== ancienne.status) {
+        actions.push({ action: 'status', detail: `${ancienne.status} → ${modifications.status}`, date: maintenant })
+    }
+
+    // Liste des champs qui ont réellement changé, par exemple ['titre', 'priorité']
+    const champsModifies = Object.keys(NOMS_CHAMPS)
+        .filter((champ) => modifications[champ] !== undefined)
+        .filter((champ) => enTexte(modifications[champ]) !== enTexte(ancienne[champ]))
+        .map((champ) => NOMS_CHAMPS[champ])
+
+    if (champsModifies.length > 0) {
+        actions.push({ action: 'modification', detail: champsModifies.join(', '), date: maintenant })
+    }
+
+    return actions
+}
+
 // Limites des étiquettes : nombre maximum par tâche et longueur maximum d'une étiquette
 const MAX_ETIQUETTES = 10
 const LONGUEUR_MAX_ETIQUETTE = 30
@@ -102,7 +146,9 @@ async function creerTache(req, res) {
             echeance: dateEcheance,
             etiquettes: listeEtiquettes,
             // Une tâche créée directement comme finie reçoit tout de suite sa date de fin
-            dateFin: status === STATUS_FINI ? new Date() : null
+            dateFin: status === STATUS_FINI ? new Date() : null,
+            // Première ligne de l'historique
+            historique: [{ action: 'creation' }]
         })
         res.status(201).json(tache)
     } catch (erreur) {
@@ -155,13 +201,15 @@ async function modifierTache(req, res) {
     }
 
     try {
+        // On a besoin de l'ancienne version de la tâche pour la date de fin et pour l'historique
+        const ancienne = await Donnee.findById(id)
+        if (!ancienne) {
+            return res.status(404).json({ message: 'Tâche introuvable.' })
+        }
+
         // Date de fin : posée quand la tâche devient finie, enlevée si elle repart dans une autre colonne
-        // Il faut connaître l'ancien status pour ne pas changer la date d'une tâche déjà finie
+        // (une tâche déjà finie garde sa date)
         if (status !== undefined) {
-            const ancienne = await Donnee.findById(id)
-            if (!ancienne) {
-                return res.status(404).json({ message: 'Tâche introuvable.' })
-            }
             if (status === STATUS_FINI && ancienne.status !== STATUS_FINI) {
                 modifications.dateFin = new Date()
             } else if (status !== STATUS_FINI) {
@@ -169,8 +217,16 @@ async function modifierTache(req, res) {
             }
         }
 
+        // $set change les champs, $push ajoute les nouvelles lignes à la fin de l'historique
+        // $slice garde seulement les MAX_HISTORIQUE dernières lignes
+        const miseAJour = { $set: modifications }
+        const actions = actionsHistorique(ancienne, modifications)
+        if (actions.length > 0) {
+            miseAJour.$push = { historique: { $each: actions, $slice: -MAX_HISTORIQUE } }
+        }
+
         // new: true renvoie la tâche après modification
-        const tache = await Donnee.findByIdAndUpdate(id, modifications, { new: true, runValidators: true })
+        const tache = await Donnee.findByIdAndUpdate(id, miseAJour, { new: true, runValidators: true })
 
         if (!tache) {
             return res.status(404).json({ message: 'Tâche introuvable.' })

@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { Calendar, CalendarClock, Check, ChevronLeft, ChevronRight, Flag, LoaderCircle, Pencil, Trash2, X } from 'lucide-react'
+import { Calendar, CalendarClock, Check, ChevronLeft, ChevronRight, Flag, History, LoaderCircle, Pencil, Trash2, X } from 'lucide-react'
 import { STATUTS } from '../statuts'
 import { PRIORITES, aujourdhui, echeanceEnTexte, estEnRetard, textePriorite } from '../priorites'
 import SousTaches from './SousTaches'
 import Etiquettes from './Etiquettes'
+import Historique from './Historique'
 
 // Transforme la date de la base en date lisible, par exemple "16 novembre 2026"
 function formaterDate(date) {
@@ -51,6 +52,8 @@ function CarteTache({
   const [saisieSousTache, setSaisieSousTache] = useState(false)
   const [saisieEtiquette, setSaisieEtiquette] = useState(false)
   const [enEdition, setEnEdition] = useState(false)
+  // Affiche ou cache le détail de l'historique sous la carte
+  const [historiqueOuvert, setHistoriqueOuvert] = useState(false)
   const [titre, setTitre] = useState(tache.titre)
   const [desc, setDesc] = useState(tache.desc || '')
   const [priorite, setPriorite] = useState(tache.priorite || 'moyenne')
@@ -257,6 +260,8 @@ function CarteTache({
 
       <SousTaches tache={tache} onMiseAJour={onMiseAJour} onSaisie={setSaisieSousTache} />
 
+      {historiqueOuvert && <Historique tache={tache} id={`historique-${tache._id}`} />}
+
       <div className="carte-pied">
         <p className="carte-date">
           <Calendar size={14} aria-hidden="true" />
@@ -287,6 +292,18 @@ function CarteTache({
               <ChevronRight size={16} aria-hidden="true" />
             </button>
           )}
+
+          <button
+            type="button"
+            className={historiqueOuvert ? 'bouton-icone bouton-discret bouton-actif' : 'bouton-icone bouton-discret'}
+            onClick={() => setHistoriqueOuvert(!historiqueOuvert)}
+            aria-expanded={historiqueOuvert}
+            aria-controls={`historique-${tache._id}`}
+            aria-label={`Historique de la tâche « ${tache.titre} »`}
+            title={historiqueOuvert ? "Cacher l'historique" : "Voir l'historique"}
+          >
+            <History size={16} aria-hidden="true" />
+          </button>
 
           <button
             type="button"
