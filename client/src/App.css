@@ -1138,3 +1138,191 @@ kbd {
     padding: var(--espace-2);
   }
 }
+
+/* Panneau des statistiques, repliable, sous le formulaire d'ajout */
+.statistiques {
+  max-width: 720px;
+  margin: 0 auto var(--espace-4);
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: var(--rayon);
+  box-shadow: var(--ombre);
+}
+
+.statistiques-resume {
+  display: flex;
+  align-items: center;
+  gap: var(--espace-2);
+  padding: var(--espace-3);
+  border-radius: var(--rayon);
+  color: var(--accent);
+  cursor: pointer;
+  list-style: none;
+}
+
+/* On cache le petit triangle par défaut, la flèche le remplace */
+.statistiques-resume::-webkit-details-marker {
+  display: none;
+}
+
+.statistiques-titre {
+  color: var(--texte);
+  font-weight: 600;
+}
+
+.statistiques-apercu {
+  margin-left: auto;
+  color: var(--texte-doux);
+  font-size: 0.9rem;
+}
+
+.statistiques-fleche {
+  color: var(--texte-doux);
+  transition: transform var(--transition);
+}
+
+.statistiques[open] .statistiques-fleche {
+  transform: rotate(180deg);
+}
+
+.statistiques-contenu {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: var(--espace-4);
+  padding: 0 var(--espace-3) var(--espace-3);
+  animation: apparition-statistiques 0.2s ease;
+}
+
+@keyframes apparition-statistiques {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.statistiques-sous-titre {
+  margin-bottom: var(--espace-3);
+  color: var(--texte-doux);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.statistiques-note {
+  margin-top: var(--espace-2);
+  color: var(--texte-doux);
+  font-size: 0.8rem;
+}
+
+/* Graphique en barres : une colonne par jour */
+.graphique {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--espace-2);
+}
+
+.graphique-jour {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espace-1);
+}
+
+.graphique-nombre {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--texte-doux);
+}
+
+.graphique-piste {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 32px;
+  height: 96px;
+  border-radius: var(--rayon-petit);
+  background: var(--colonne-fond);
+  overflow: hidden;
+}
+
+.graphique-barre {
+  width: 100%;
+  border-radius: var(--rayon-petit);
+  background: var(--succes);
+  opacity: 0.75;
+  transition: height 0.3s ease;
+}
+
+.graphique-jour-nom {
+  color: var(--texte-doux);
+  font-size: 0.75rem;
+}
+
+/* Aujourd'hui ressort un peu plus */
+.graphique-aujourdhui .graphique-barre {
+  opacity: 1;
+}
+
+.graphique-aujourdhui .graphique-jour-nom,
+.graphique-aujourdhui .graphique-nombre {
+  color: var(--texte);
+  font-weight: 700;
+}
+
+/* Totaux par status, avec les couleurs des colonnes du tableau */
+.totaux {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espace-2);
+}
+
+/* Couleur de la colonne "List" (les deux autres viennent de .colonne-encours et .colonne-fini) */
+.total.colonne-liste,
+.repartition-part.colonne-liste {
+  --couleur-colonne: var(--texte-doux);
+}
+
+.total {
+  display: flex;
+  align-items: center;
+  gap: var(--espace-2);
+  font-size: 0.9rem;
+}
+
+.total-nom {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.total-nombre {
+  margin-left: auto;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.repartition {
+  display: flex;
+  gap: 3px;
+  height: 8px;
+  margin-top: var(--espace-3);
+  border-radius: 999px;
+  background: var(--colonne-fond);
+  overflow: hidden;
+}
+
+.repartition-part {
+  background: var(--couleur-colonne);
+}
+
+/* Sur petit écran : le graphique au-dessus des totaux */
+@media (max-width: 620px) {
+  .statistiques-contenu {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .statistiques-apercu {
+    font-size: 0.8rem;
+  }
+}

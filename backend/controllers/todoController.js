@@ -4,6 +4,8 @@ const Donnee = require('../model/donnee')
 // Les seules valeurs acceptées pour le champ status (les mêmes que dans le modèle)
 const STATUS_AUTORISES = Donnee.schema.path('status').enumValues
 const PRIORITES_AUTORISEES = Donnee.schema.path('priorite').enumValues
+// Le status qui veut dire que la tâche est terminée
+const STATUS_FINI = 'Fini avec succès !'
 
 // Vérifie l'échéance reçue : null ou '' pour l'enlever, sinon une date valide
 // Renvoie la valeur à enregistrer, ou undefined si la date est invalide
@@ -98,7 +100,9 @@ async function creerTache(req, res) {
             status,
             priorite,
             echeance: dateEcheance,
-            etiquettes: listeEtiquettes
+            etiquettes: listeEtiquettes,
+            // Une tâche créée directement comme finie reçoit tout de suite sa date de fin
+            dateFin: status === STATUS_FINI ? new Date() : null
         })
         res.status(201).json(tache)
     } catch (erreur) {
@@ -151,6 +155,20 @@ async function modifierTache(req, res) {
     }
 
     try {
+        // Date de fin : posée quand la tâche devient finie, enlevée si elle repart dans une autre colonne
+        // Il faut connaître l'ancien status pour ne pas changer la date d'une tâche déjà finie
+        if (status !== undefined) {
+            const ancienne = await Donnee.findById(id)
+            if (!ancienne) {
+                return res.status(404).json({ message: 'Tâche introuvable.' })
+            }
+            if (status === STATUS_FINI && ancienne.status !== STATUS_FINI) {
+                modifications.dateFin = new Date()
+            } else if (status !== STATUS_FINI) {
+                modifications.dateFin = null
+            }
+        }
+
         // new: true renvoie la tâche après modification
         const tache = await Donnee.findByIdAndUpdate(id, modifications, { new: true, runValidators: true })
 

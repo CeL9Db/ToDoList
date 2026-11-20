@@ -22,7 +22,9 @@ const donnee = new mongoose.Schema(
         // Les sous-tâches sont rangées directement dans le document de la tâche
         sousTaches: {type: [sousTache], default: []},
         // Étiquettes libres, par exemple ['travail', 'urgent'] (de simples textes)
-        etiquettes: {type: [String], default: []}
+        etiquettes: {type: [String], default: []},
+        // Date à laquelle la tâche est passée à 'Fini avec succès !' (null tant qu'elle n'est pas finie)
+        dateFin: {type: Date, default: null}
     }
 )
 
