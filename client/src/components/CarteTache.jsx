@@ -33,8 +33,10 @@ function formaterEcheance(echeance) {
 // onDebutGlisser / onFinGlisser : préviennent le tableau qu'on commence ou arrête de glisser la carte
 // onMiseAJour : remplace la tâche dans la liste (utilisé par les sous-tâches et les étiquettes)
 // onFiltrerEtiquette : clic sur une étiquette, pour filtrer le tableau
+// deplacable : false pour une carte qu'on ne peut pas glisser (dans la matrice)
 function CarteTache({
   tache,
+  deplacable = true,
   onSupprimer,
   onChangerStatus,
   onModifier,
@@ -223,7 +225,7 @@ function CarteTache({
   // La carte peut être glissée vers une autre colonne ; les flèches restent
   // disponibles pour le clavier et les lecteurs d'écran
   return (
-    <li className={classes} draggable={!saisieSousTache && !saisieEtiquette} onDragStart={commencerGlisser} onDragEnd={terminerGlisser}>
+    <li className={classes} draggable={deplacable && !saisieSousTache && !saisieEtiquette} onDragStart={commencerGlisser} onDragEnd={terminerGlisser}>
       <h3 className="carte-titre">{tache.titre}</h3>
 
       {tache.desc && <p className="carte-desc">{tache.desc}</p>}

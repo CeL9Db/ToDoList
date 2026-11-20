@@ -7,6 +7,8 @@ import { filtrerParEtiquette, toutesLesEtiquettes } from './etiquettes'
 import BarreRecherche from './components/BarreRecherche'
 import FiltreEtiquettes from './components/FiltreEtiquettes'
 import ColonneStatut from './components/ColonneStatut'
+import MatriceEisenhower from './components/MatriceEisenhower'
+import ChoixVue from './components/ChoixVue'
 import FormulaireAjout from './components/FormulaireAjout'
 import Notification from './components/Notification'
 import './App.css'
@@ -34,6 +36,8 @@ function App() {
   const [etiquetteChoisie, setEtiquetteChoisie] = useState('')
   // Tâche en train d'être glissée vers une autre colonne (null = aucune)
   const [tacheGlissee, setTacheGlissee] = useState(null)
+  // Vue affichée : 'tableau' (trois colonnes) ou 'matrice' (matrice d'Eisenhower)
+  const [vue, setVue] = useState('tableau')
 
   // Demande les tâches au serveur et range le résultat dans l'état
   async function chargerTaches() {
@@ -258,6 +262,19 @@ function App() {
       )
     }
 
+    if (vue === 'matrice') {
+      return (
+        <MatriceEisenhower
+          taches={tachesAffichees}
+          onSupprimer={demanderSuppression}
+          onChangerStatus={changerStatus}
+          onModifier={enregistrerModification}
+          onMiseAJour={remplacerDansLaListe}
+          onFiltrerEtiquette={setEtiquetteChoisie}
+        />
+      )
+    }
+
     return (
       <div className="tableau">
         {/* Une colonne par status, chacune ne reçoit que ses tâches */}
@@ -300,6 +317,8 @@ function App() {
             {chargement || erreur ? 'ToDoList' : texteNombreTaches()}
           </p>
         </div>
+        {/* Le choix de la vue n'apparaît que lorsqu'il y a des tâches à afficher */}
+        {!chargement && !erreur && taches.length > 0 && <ChoixVue vue={vue} onChoisir={setVue} />}
       </header>
 
       <main>
