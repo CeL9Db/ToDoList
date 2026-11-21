@@ -5,8 +5,8 @@ import { PRIORITES, aujourdhui, echeanceEnTexte, estEnRetard, textePriorite } fr
 import SousTaches from './SousTaches'
 import Etiquettes from './Etiquettes'
 import Historique from './Historique'
+
 // Transforme la date de la base en date lisible et courte, par exemple "16 nov. 2026"
-// Transforme la date de la base en date lisible, par exemple "16 novembre 2026"
 function formaterDate(date) {
   return new Date(date).toLocaleDateString('fr-FR', {
     day: 'numeric',
