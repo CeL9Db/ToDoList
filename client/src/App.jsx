@@ -9,6 +9,7 @@ import FiltreEtiquettes from './components/FiltreEtiquettes'
 import ColonneStatut from './components/ColonneStatut'
 import MatriceEisenhower from './components/MatriceEisenhower'
 import ChoixVue from './components/ChoixVue'
+import ChoixTheme from './components/ChoixTheme'
 import FormulaireAjout from './components/FormulaireAjout'
 import Notification from './components/Notification'
 import PanneauStatistiques from './components/PanneauStatistiques'
@@ -312,7 +313,7 @@ function App() {
         <div className="logo" aria-hidden="true">
           <ListTodo size={24} />
         </div>
-        <div>
+        <div className="entete-textes">
           <h1 className="entete-titre">Mes tâches</h1>
           <p className="entete-sous-titre">
             {chargement || erreur ? 'ToDoList' : texteNombreTaches()}
@@ -320,6 +321,7 @@ function App() {
         </div>
         {/* Le choix de la vue n'apparaît que lorsqu'il y a des tâches à afficher */}
         {!chargement && !erreur && taches.length > 0 && <ChoixVue vue={vue} onChoisir={setVue} />}
+        <ChoixTheme />
       </header>
 
       <main>

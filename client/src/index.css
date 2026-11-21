@@ -18,6 +18,8 @@
   --notification-fond: #1c2030;
   --notification-texte: #f5f6fa;
   --notification-accent: #9aadff;
+  /* Texte posé sur la couleur d'accent (bouton principal, logo) */
+  --sur-accent: #ffffff;
 
   /* Six couleurs douces pour les étiquettes : fond et texte */
   --etiquette-0-fond: #e6effd;
@@ -50,9 +52,12 @@
   color-scheme: light dark;
 }
 
-/* Thème sombre : on suit le réglage du système */
+/* Thème sombre, appliqué dans deux cas :
+   - le système est en sombre et l'utilisateur n'a pas forcé le thème clair
+   - l'utilisateur a choisi le thème sombre avec le bouton de l'en-tête (data-theme="sombre") */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='clair']) {
+    --sur-accent: #12141c;
     --fond: #12141c;
     --surface: #1b1e29;
     --colonne-fond: #171a24;
@@ -87,7 +92,52 @@
 
     --ombre: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.25);
     --ombre-survol: 0 2px 4px rgba(0, 0, 0, 0.35), 0 12px 28px rgba(0, 0, 0, 0.35);
+    color-scheme: dark;
   }
+}
+
+:root[data-theme='sombre'] {
+  --sur-accent: #12141c;
+  --fond: #12141c;
+  --surface: #1b1e29;
+  --colonne-fond: #171a24;
+  --bordure: #2b2f3e;
+  --texte: #eceef5;
+  --texte-doux: #9aa1b5;
+  --accent: #8097ff;
+  --accent-fonce: #9aadff;
+  --accent-clair: #242b4a;
+  --succes: #5fcb98;
+  --succes-clair: #1a3329;
+  --danger: #f08080;
+  --danger-clair: #3a2023;
+  --attention: #f0b45a;
+  --attention-clair: #3a2e1a;
+  --notification-fond: #eceef5;
+  --notification-texte: #1c2030;
+  --notification-accent: #3f58d0;
+
+  --etiquette-0-fond: #1f2c47;
+  --etiquette-0-texte: #93b6f5;
+  --etiquette-1-fond: #1a3329;
+  --etiquette-1-texte: #79d3a8;
+  --etiquette-2-fond: #3a2a1d;
+  --etiquette-2-texte: #f2b27f;
+  --etiquette-3-fond: #2e2340;
+  --etiquette-3-texte: #c9a3f0;
+  --etiquette-4-fond: #3a1f2a;
+  --etiquette-4-texte: #f29bbb;
+  --etiquette-5-fond: #193339;
+  --etiquette-5-texte: #7fd0df;
+
+  --ombre: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 20px rgba(0, 0, 0, 0.25);
+  --ombre-survol: 0 2px 4px rgba(0, 0, 0, 0.35), 0 12px 28px rgba(0, 0, 0, 0.35);
+  color-scheme: dark;
+}
+
+/* Thème clair forcé : les éléments natifs (calendrier, listes) restent clairs */
+:root[data-theme='clair'] {
+  color-scheme: light;
 }
 
 *,
@@ -98,6 +148,7 @@
 
 body {
   margin: 0;
+  transition: background-color var(--transition), color var(--transition);
   min-height: 100vh;
   background: var(--fond);
   color: var(--texte);
@@ -135,4 +186,14 @@ button {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Texte lu par les lecteurs d'écran mais caché à l'écran */
+.visuellement-cache {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

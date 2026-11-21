@@ -5,12 +5,12 @@ import { PRIORITES, aujourdhui, echeanceEnTexte, estEnRetard, textePriorite } fr
 import SousTaches from './SousTaches'
 import Etiquettes from './Etiquettes'
 import Historique from './Historique'
-
+// Transforme la date de la base en date lisible et courte, par exemple "16 nov. 2026"
 // Transforme la date de la base en date lisible, par exemple "16 novembre 2026"
 function formaterDate(date) {
   return new Date(date).toLocaleDateString('fr-FR', {
     day: 'numeric',
-    month: 'long',
+    month: 'short',
     year: 'numeric',
   })
 }
@@ -263,8 +263,10 @@ function CarteTache({
       {historiqueOuvert && <Historique tache={tache} id={`historique-${tache._id}`} />}
 
       <div className="carte-pied">
-        <p className="carte-date">
+        {/* Date courte ("19 nov. 2026") pour que les boutons tiennent sur la même ligne */}
+        <p className="carte-date" title="Date de création">
           <Calendar size={14} aria-hidden="true" />
+          <span className="visuellement-cache">Créée le </span>
           {formaterDate(tache.date)}
         </p>
 

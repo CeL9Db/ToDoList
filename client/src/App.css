@@ -23,8 +23,28 @@
   height: 48px;
   border-radius: var(--rayon);
   background: var(--accent);
-  color: #ffffff;
+  color: var(--sur-accent);
   box-shadow: var(--ombre);
+}
+
+.entete-textes {
+  /* Le bloc du titre prend la place libre : les boutons partent à droite */
+  flex: 1;
+  min-width: 0;
+}
+
+/* Bouton du thème (système, clair, sombre) à droite de l'en-tête */
+.bouton-icone.choix-theme {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--bordure);
+  background: var(--surface);
+}
+
+.bouton-icone.choix-theme:hover {
+  background: var(--accent-clair);
+  color: var(--accent);
 }
 
 .entete-titre {
@@ -78,8 +98,11 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: var(--espace-2) var(--espace-3);
+  gap: var(--espace-1) var(--espace-2);
   margin-top: var(--espace-3);
+  /* Petite ligne de séparation entre le contenu et les actions */
+  padding-top: var(--espace-2);
+  border-top: 1px solid var(--bordure);
 }
 
 .carte-date {
@@ -137,8 +160,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border: none;
   border-radius: 50%;
   background: transparent;
@@ -156,7 +179,7 @@
   display: flex;
   margin-left: auto;
   align-items: center;
-  gap: 2px;
+  gap: 0;
 }
 
 /* La corbeille reste discrète et devient rouge au survol */
@@ -337,7 +360,7 @@
   border: none;
   border-radius: var(--rayon-petit);
   background: var(--accent);
-  color: #ffffff;
+  color: var(--sur-accent);
   font-weight: 600;
   transition: background var(--transition), transform var(--transition);
 }
@@ -1214,13 +1237,15 @@ kbd {
   }
 }
 
-/* Sur mobile : l'interrupteur passe sous le titre, sur toute la largeur */
+/* Sur mobile : l'interrupteur passe sous le titre, sur toute la largeur
+   (le bouton du thème reste à côté du titre grâce à order) */
 @media (max-width: 520px) {
   .entete {
     flex-wrap: wrap;
   }
 
   .choix-vue {
+    order: 1;
     width: 100%;
   }
 
